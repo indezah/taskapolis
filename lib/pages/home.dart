@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 onTap: () {
                   // Navigate to the settings page
                   FirebaseAuth.instance.signOut().then((value) =>
-                      Navigator.push(
+                      Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                               builder: (context) => SigninScreen())));
@@ -150,35 +150,42 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         body: TabBarView(
           controller: _tabController,
           children: <Widget>[
-            ListView.builder(
-              itemCount: allTasks.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: ListTile(
-                      title: Text(allTasks[index],
-                          style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600)),
-                      leading: FlutterLogo(size: 56.0),
-                      subtitle: Text('Here is a second line'),
-                      trailing: Checkbox(
-                        onChanged: (value) => {
-                          // setState(() {
-                          //   allTasks[index].isDone = value!;
-                          // })
-                        },
-                        value: false,
-                      ),
-                      onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) =>
-                        //           EditTaskPage(task: allTasks[index])),
-                        // );
-                      }),
-                );
+            RefreshIndicator(
+              onRefresh: () async {
+                // Reload the data here
+                // You can call your function to fetch the data here
+                // For example, fetchTodoItems();
               },
+              child: ListView.builder(
+                itemCount: allTasks.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: ListTile(
+                        title: Text(allTasks[index],
+                            style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600)),
+                        leading: FlutterLogo(size: 56.0),
+                        subtitle: Text('Here is a second line'),
+                        trailing: Checkbox(
+                          onChanged: (value) => {
+                            // setState(() {
+                            //   allTasks[index].isDone = value!;
+                            // })
+                          },
+                          value: false,
+                        ),
+                        onTap: () {
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           EditTaskPage(task: allTasks[index])),
+                          // );
+                        }),
+                  );
+                },
+              ),
             ),
             Center(
               child: Text("It's rainy here"),
