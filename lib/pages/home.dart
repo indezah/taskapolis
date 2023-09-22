@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:taskapolis/pages/signin.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -73,13 +75,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                title: Text('Settings'),
+                title: Text('Logout'),
                 onTap: () {
                   // Navigate to the settings page
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Placeholder()),
-                  );
+                  FirebaseAuth.instance.signOut().then((value) =>
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SigninScreen())));
                 },
               ),
             ],
