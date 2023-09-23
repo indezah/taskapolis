@@ -8,247 +8,105 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  late final TabController _tabController;
+class _HomePageState extends State<HomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  final user = FirebaseAuth.instance.currentUser;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+  void _showProfileDialog() {
+    _scaffoldKey.currentState?.openEndDrawer();
   }
-
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  final allTasks = [
-    'Task 1',
-    'Task 2',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 4',
-    'Task 5',
-  ];
-
-  final pendingTasks = [
-    'Task 1',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 5',
-  ];
-
-  final completedTasks = [
-    'Task 2',
-    'Task w4',
-    'Task 4',
-  ];
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: 1,
-      length: 3,
-      child: Scaffold(
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              ListTile(
-                title: Text('Home'),
-                onTap: () {
-                  // Navigate to the home page
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Logout'),
-                onTap: () {
-                  // Navigate to the settings page
-                  FirebaseAuth.instance.signOut().then((value) =>
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => AuthPage())));
-                },
-              ),
-            ],
-          ),
-        ),
-
-        appBar: AppBar(
-          // scrolledUnderElevation: scrolledUnderElevation,
-          title: Center(
-              child: Text(
-            'TASKAPOLIS',
-            style: TextStyle(
-              fontFamily: 'Space-Grotesk',
-              fontWeight: FontWeight.bold, // Apply bold style
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text('TASKOPOLIS'),
+        actions: <Widget>[
+          IconButton(
+            icon: CircleAvatar(
+              backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Replace with your image url
             ),
-          )),
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: const <Widget>[
-              Tab(
-                text: 'ALL',
-              ),
-              Tab(
-                text: 'PENDING',
-              ),
-              Tab(
-                text: 'COMPLETED',
-              ),
-            ],
+            onPressed: _showProfileDialog,
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                // // Implement search feature
-                // showSearch(context: context, delegate: TaskSearch(allTasks));
-              },
-            ),
-          ],
-        ),
-        // bottomNavigationBar: NavigationBar(
-        //   onDestinationSelected: (int index) {
-        //     setState(() {
-        //       currentPageIndex = index;
-        //     });
-        //   },
-        //   indicatorColor: Colors.amber[800],
-        //   selectedIndex: currentPageIndex,
-        //   destinations: const <Widget>[
-        //     NavigationDestination(
-        //       selectedIcon: Icon(Icons.home),
-        //       icon: Icon(Icons.home_outlined),
-        //       label: 'Home',
-        //     ),
-        //     NavigationDestination(
-        //       icon: Icon(Icons.business),
-        //       label: 'Business',
-        //     ),
-        //     NavigationDestination(
-        //       selectedIcon: Icon(Icons.school),
-        //       icon: Icon(Icons.school_outlined),
-        //       label: 'School',
-        //     ),
-        //   ],
-        // ),
-        body: TabBarView(
-          controller: _tabController,
+        ],
+      ),
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: <Widget>[
-            RefreshIndicator(
-              onRefresh: () async {
-                // Reload the data here
-                // You can call your function to fetch the data here
-                // For example, fetchTodoItems();
-              },
-              child: ListView.builder(
-                itemCount: allTasks.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                        title: Text(allTasks[index],
-                            style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w600)),
-                        leading: FlutterLogo(size: 56.0),
-                        subtitle: Text('Here is a second line'),
-                        trailing: Checkbox(
-                          onChanged: (value) => {
-                            // setState(() {
-                            //   allTasks[index].isDone = value!;
-                            // })
-                          },
-                          value: false,
-                        ),
-                        onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //       builder: (context) =>
-                          //           EditTaskPage(task: allTasks[index])),
-                          // );
-                        }),
-                  );
-                },
+            UserAccountsDrawerHeader(
+              accountName: Text('Username'), // Replace with actual username
+              accountEmail: Text('email@example.com'), // Replace with actual email
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Replace with your image url
               ),
             ),
-            Center(
-              child: Text("It's rainy here"),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              onTap: () {
+                // Add your settings logic here
+              },
             ),
-            Center(
-              child: Text("It's sunny here"),
+            ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Log Out'),
+              onTap: () {
+                // Add your log out logic here
+              },
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: () {
-            // // Navigate to the task input screen
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => AddTaskPage()),
-            // );
-          },
-        ),
+      ),
+      body: Column(
+        children: <Widget>[
+          Wrap(
+            spacing: 8.0,
+            children: <Widget>[
+              FilterChip(
+                label: Text('All'),
+                selected: true,
+                onSelected: (bool value) {
+                  print('All');
+                },
+              ),
+              FilterChip(
+                label: Text('Today'),
+                onSelected: (bool value) {
+                  print('Today');
+                },
+              ),
+              FilterChip(
+                label: Text('Work'),
+                onSelected: (bool value) {
+                  print('Work');
+                },
+              ),
+              FilterChip(
+                label: Text('Shopping'),
+                onSelected: (bool value) {
+                  print('Shopping');
+                },
+              ),
+              FilterChip(
+                label: Text('Anytime'),
+                onSelected: (bool value) {
+                  print('Anytime');
+                },
+              ),
+            ],
+          ),
+          Divider(),
+          Expanded(
+            child: ListView.builder(
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return Card(child: ListTile(title: Text('Item ${index + 1}'))); // Replace with your data
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
-
-  // Widget _buildBody() {
-  //   switch (_currentIndex) {
-  //     case 0:
-  //       return ListView.builder(
-  //         itemCount: allTasks.length,
-  //         itemBuilder: (context, index) {
-  //           return ListTile(
-  //               title: Text(allTasks[index]),
-  //               onTap: () {
-  //                 Navigator.push(
-  //                   context,
-  //                   MaterialPageRoute(
-  //                       builder: (context) =>
-  //                           EditTaskPage(task: allTasks[index])),
-  //                 );
-  //               });
-  //         },
-  //       );
-  //     case 1:
-  //       return ListView.builder(
-  //         itemCount: pendingTasks.length,
-  //         itemBuilder: (context, index) {
-  //           return ListTile(
-  //             title: Text(pendingTasks[index]),
-  //           );
-  //         },
-  //       );
-  //     case 2:
-  //       return ListView.builder(
-  //         itemCount: completedTasks.length,
-  //         itemBuilder: (context, index) {
-  //           return ListTile(
-  //             title: Text(completedTasks[index]),
-  //           );
-  //         },
-  //       );
-  //     default:
-  //       return Container();
-  //   }
-  // }
 }
