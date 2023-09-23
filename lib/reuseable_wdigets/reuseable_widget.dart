@@ -31,7 +31,7 @@ TextField reuseableTextField(String text, IconData icon, bool isPasswordType,
   );
 }
 
-Container singInSignUpButton(
+Container signInSignUpButton(
     BuildContext context, bool isLogin, Function onTap) {
   return Container(
       width: MediaQuery.of(context).size.width,

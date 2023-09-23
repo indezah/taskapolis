@@ -4,9 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/firebase_options.dart';
-import 'package:taskapolis/pages/home.dart';
-
-import 'package:taskapolis/pages/signin.dart';
+import 'package:taskapolis/pages/auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,20 +45,14 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/signin' : '/home',
-      routes: {
-        '/signin': (context) => SigninScreen(),
-        '/home': (context) => HomePage(),
-      },
-      title: 'Flutter Demo',
+      title: 'Taskapolis',
       theme: ThemeData(
         fontFamily: 'Inter',
         colorScheme:
             ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 0, 76, 255)),
         useMaterial3: true,
       ),
-      home: SigninScreen(),
+      home: AuthPage(),
     );
   }
 }

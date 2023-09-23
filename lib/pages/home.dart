@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/signin.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,6 +10,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final TabController _tabController;
+
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -68,7 +71,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 title: Text('Home'),
                 onTap: () {
                   // Navigate to the home page
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => HomePage()),
                   );
@@ -79,15 +82,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 onTap: () {
                   // Navigate to the settings page
                   FirebaseAuth.instance.signOut().then((value) =>
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SigninScreen())));
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => AuthPage())));
                 },
               ),
             ],
           ),
         ),
+
         appBar: AppBar(
           // scrolledUnderElevation: scrolledUnderElevation,
           title: Center(

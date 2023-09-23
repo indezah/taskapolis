@@ -15,6 +15,79 @@ class _SigninScreenState extends State<SigninScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  void signIn() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: emailController.text, password: passwordController.text);
+      Navigator.pop(context);
+      Navigator.popUntil(context, (route) => route.isFirst);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      if (e.code == 'INVALID_LOGIN_CREDENTIALS') {
+        incorrectCredentialsMessage();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void wrongPasswordMessage() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          backgroundColor: Colors.deepPurple,
+          title: Center(
+            child: Text(
+              'Incorrect Password',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void incorrectCredentialsMessage() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+            title: const Text('Sign In Failed'),
+            content: const Text('Incorrect Email or Password'),
+            actions: <Widget>[
+              TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Try Again'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ]);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,19 +109,7 @@ class _SigninScreenState extends State<SigninScreen> {
                 reuseableTextField(
                     "Password", Icons.lock_outline, true, passwordController),
                 SizedBox(height: 20),
-                singInSignUpButton(context, true, () {
-                  FirebaseAuth.instance
-                      .signInWithEmailAndPassword(
-                          email: emailController.text,
-                          password: passwordController.text)
-                      .then((value) {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => HomePage()));
-                    return null;
-                  }).onError((error, stackTrace) {
-                    return null;
-                  });
-                }),
+                signInSignUpButton(context, true, signIn),
                 signUpOption()
               ]),
             ))));
@@ -59,15 +120,17 @@ class _SigninScreenState extends State<SigninScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text("Don't have account?",
-            style: TextStyle(color: Colors.white70)),
+            style: TextStyle(color: Color.fromARGB(179, 45, 45, 45))),
         GestureDetector(
           onTap: () {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => signUpScreen()));
+                MaterialPageRoute(builder: (context) => const signUpScreen()));
           },
           child: const Text(
             " Sign Up",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                color: Color.fromARGB(255, 5, 84, 255),
+                fontWeight: FontWeight.bold),
           ),
         )
       ],
