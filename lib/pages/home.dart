@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
@@ -13,50 +14,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   final user = FirebaseAuth.instance.currentUser;
 
-  @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
   }
 
+  @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
 
-  final allTasks = [
-    'Task 1',
-    'Task 2',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 4',
-    'Task 5',
-  ];
+  var allTasks = [];
 
-  final pendingTasks = [
-    'Task 1',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 3',
-    'Task 5',
-  ];
+  var pendingTasks = [];
 
-  final completedTasks = [
-    'Task 2',
-    'Task w4',
-    'Task 4',
-  ];
+  var completedTasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +62,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ],
           ),
         ),
-
         appBar: AppBar(
           // scrolledUnderElevation: scrolledUnderElevation,
           title: Center(
@@ -124,31 +96,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           ],
         ),
-        // bottomNavigationBar: NavigationBar(
-        //   onDestinationSelected: (int index) {
-        //     setState(() {
-        //       currentPageIndex = index;
-        //     });
-        //   },
-        //   indicatorColor: Colors.amber[800],
-        //   selectedIndex: currentPageIndex,
-        //   destinations: const <Widget>[
-        //     NavigationDestination(
-        //       selectedIcon: Icon(Icons.home),
-        //       icon: Icon(Icons.home_outlined),
-        //       label: 'Home',
-        //     ),
-        //     NavigationDestination(
-        //       icon: Icon(Icons.business),
-        //       label: 'Business',
-        //     ),
-        //     NavigationDestination(
-        //       selectedIcon: Icon(Icons.school),
-        //       icon: Icon(Icons.school_outlined),
-        //       label: 'School',
-        //     ),
-        //   ],
-        // ),
         body: TabBarView(
           controller: _tabController,
           children: <Widget>[
@@ -158,33 +105,60 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 // You can call your function to fetch the data here
                 // For example, fetchTodoItems();
               },
-              child: ListView.builder(
-                itemCount: allTasks.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                        title: Text(allTasks[index],
-                            style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w600)),
-                        leading: FlutterLogo(size: 56.0),
-                        subtitle: Text('Here is a second line'),
-                        trailing: Checkbox(
-                          onChanged: (value) => {
-                            // setState(() {
-                            //   allTasks[index].isDone = value!;
-                            // })
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user?.uid)
+                    .collection('tasks')
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Something went wrong');
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container(
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator());
+                  }
+
+                  allTasks = snapshot.data!.docs.map((DocumentSnapshot doc) {
+                    Map<String, dynamic> data =
+                        doc.data()! as Map<String, dynamic>;
+                    return data;
+                  }).toList();
+
+                  print(allTasks);
+
+                  return ListView.builder(
+                    itemCount: allTasks.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        child: ListTile(
+                          title: Text("${allTasks[index]['name']}",
+                              style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w600)),
+                          leading: FlutterLogo(size: 56.0),
+                          subtitle: Text('Here is a second line'),
+                          trailing: Checkbox(
+                            onChanged: (value) => {
+                              // setState(() {
+                              //   allTasks[index].isDone = value!;
+                              // })
+                            },
+                            value: false,
+                          ),
+                          onTap: () {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) =>
                           },
-                          value: false,
                         ),
-                        onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //       builder: (context) =>
-                          //           EditTaskPage(task: allTasks[index])),
-                          // );
-                        }),
+                      );
+                    },
                   );
                 },
               ),
@@ -210,45 +184,4 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
-
-  // Widget _buildBody() {
-  //   switch (_currentIndex) {
-  //     case 0:
-  //       return ListView.builder(
-  //         itemCount: allTasks.length,
-  //         itemBuilder: (context, index) {
-  //           return ListTile(
-  //               title: Text(allTasks[index]),
-  //               onTap: () {
-  //                 Navigator.push(
-  //                   context,
-  //                   MaterialPageRoute(
-  //                       builder: (context) =>
-  //                           EditTaskPage(task: allTasks[index])),
-  //                 );
-  //               });
-  //         },
-  //       );
-  //     case 1:
-  //       return ListView.builder(
-  //         itemCount: pendingTasks.length,
-  //         itemBuilder: (context, index) {
-  //           return ListTile(
-  //             title: Text(pendingTasks[index]),
-  //           );
-  //         },
-  //       );
-  //     case 2:
-  //       return ListView.builder(
-  //         itemCount: completedTasks.length,
-  //         itemBuilder: (context, index) {
-  //           return ListTile(
-  //             title: Text(completedTasks[index]),
-  //           );
-  //         },
-  //       );
-  //     default:
-  //       return Container();
-  //   }
-  // }
 }

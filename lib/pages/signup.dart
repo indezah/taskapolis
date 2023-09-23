@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/home.dart';
@@ -39,9 +40,18 @@ class _signUpScreenState extends State<signUpScreen> {
         errorMessage('Passwords do not match', false);
         return;
       }
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _emailTextController.text,
-          password: _passwordTextController.text);
+      var userCredentials = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: _emailTextController.text,
+              password: _passwordTextController.text);
+
+      print('userCredentials: $userCredentials');
+      await addUserDetails(
+          userCredentials.user!.uid,
+          _firstNameTextController.text.trim(),
+          _lastNameTextController.text.trim(),
+          _emailTextController.text.trim());
+
       Navigator.pop(context);
       Navigator.popUntil(context, (route) => route.isFirst);
 
@@ -56,6 +66,17 @@ class _signUpScreenState extends State<signUpScreen> {
         errorMessage('The account already exists for that email.', true);
       }
     }
+  }
+
+  Future addUserDetails(
+      String userid, String firstName, String lastName, String email) async {
+    DocumentReference userRef =
+        FirebaseFirestore.instance.collection('users').doc(userid);
+    return userRef.set({
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+    });
   }
 
   void errorMessage(String message, bool isUsed) {
