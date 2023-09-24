@@ -48,8 +48,14 @@ class _MyAppState extends State<MyApp> {
       title: 'Taskapolis',
       theme: ThemeData(
         fontFamily: 'Inter',
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 0, 76, 255)),
+        // dark theme
+        // brightness: Brightness.dark,
+        // light
+
+        // material color
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Color.fromARGB(255, 0, 106, 255),
+            brightness: Brightness.dark),
         useMaterial3: true,
       ),
       home: AuthPage(),
