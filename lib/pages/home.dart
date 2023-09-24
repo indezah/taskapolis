@@ -71,213 +71,255 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Hello Nisura',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        // search
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // showSearch(context: context, delegate: DataSearch());
-            },
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('Taskapolis'),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-            ),
-            ListTile(
-              title: Text('Sign Out'),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.pop(context);
-                Navigator.popUntil(context, (route) => route.isFirst);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => AuthPage()),
-                );
+        backgroundColor: Color.fromRGBO(238, 238, 255, 1),
+        appBar: AppBar(
+          backgroundColor: Color.fromRGBO(238, 238, 255, 1),
+          title: Text('Todo List'),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                // Implement search functionality here
               },
             ),
           ],
         ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+        drawer: Drawer(
+            // Implement navigation drawer here
+            ),
+        body: StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('tasks')
+              // .orderBy('completed')
+              .orderBy('priority', descending: true)
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text('Something went wrong');
+            }
+
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Text("Loading");
+            }
+
+            // if empty show empty message
+            if (snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: Text('No tasks found'),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: ListView.builder(
+                itemCount: snapshot.data!.docs.length + 1,
+                itemBuilder: (context, index) {
+                  if (index < snapshot.data!.docs.length) {
+                    DocumentSnapshot document = snapshot.data!.docs[index];
+                    Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
+                    DateTime? taskDate = data['timestamp'] != null
+                        ? (data['timestamp'] as Timestamp).toDate()
+                        : null;
+                    DateTime now = DateTime.now();
+                    bool isToday = taskDate != null &&
+                        now.year == taskDate.year &&
+                        now.month == taskDate.month &&
+                        now.day == taskDate.day;
+
+                    // If the task is not for today and we are still in the 'Today' section, skip this task
+                    if (!isToday && index < snapshot.data!.docs.length - 1) {
+                      DocumentSnapshot nextDocument =
+                          snapshot.data!.docs[index + 1];
+                      Map<String, dynamic> nextData =
+                          nextDocument.data() as Map<String, dynamic>;
+                      DateTime? nextTaskDate = nextData['timestamp'] != null
+                          ? (nextData['timestamp'] as Timestamp).toDate()
+                          : null;
+                      bool isNextTaskToday = nextTaskDate != null &&
+                          now.year == nextTaskDate.year &&
+                          now.month == nextTaskDate.month &&
+                          now.day == nextTaskDate.day;
+
+                      if (isNextTaskToday) {
+                        return Container(); // Return an empty container to maintain the index
+                      }
+                    }
+
+                    return Container(
+                      // margin between each task
+                      // border radius
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(0, 0, 0, 0.1),
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      child: ListTile(
+                        title: Text(
+                          data['title'],
+                          style: data['completed']
+                              ? TextStyle(
+                                  decoration: TextDecoration.lineThrough)
+                              : null,
+                        ),
+                        trailing: Column(
+                          // align to the right
+
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          // mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // if priority is 3, show !!! in red
+                            // if priority is 2, show !! in orange
+                            // if priority is 1, show ! in yellow
+                            // if priority is 0, show nothing
+
+                            Text(
+                                data['priority'] == 3
+                                    ? '!!!'
+                                    : data['priority'] == 2
+                                        ? '!!'
+                                        : data['priority'] == 1
+                                            ? '!'
+                                            : '',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: data['priority'] == 3
+                                        ? Colors.red
+                                        : data['priority'] == 2
+                                            ? Colors.orange
+                                            : data['priority'] == 1
+                                                ? Colors.yellow
+                                                : Colors.white)),
+
+                            Text(
+                                'Time: ${taskDate != null ? taskDate.toString() : 'No timestamp'}'),
+                          ],
+                        ),
+                        leading: Checkbox(
+                          value: data['completed'],
+                          onChanged: (bool? value) {
+                            document.reference.update({'completed': value});
+                          },
+                        ),
+                      ),
+                    );
+                  } else {
+                    return Container(
+                        height: 80); // Add an empty container at the end
+                  }
+                },
+              ),
+            );
+          },
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.2),
+                blurRadius: 40,
+                offset: Offset(0, -5),
+              ),
+            ],
+            color: Color.fromRGBO(102, 60, 255, 1),
+            // borderRadius: BorderRadius.only(
+            //   topLeft: Radius.circular(25.0),
+            //   topRight: Radius.circular(25.0),
+            // ),
+          ),
+          height: 120.0,
           child: Column(
             children: <Widget>[
-              // StreamBuilder<QuerySnapshot>(
-              //   stream: FirebaseFirestore.instance
-              //       .collection('users')
-              //       .doc(userId)
-              //       .collection('categories')
-              //       .snapshots(),
-              //   builder: (BuildContext context,
-              //       AsyncSnapshot<QuerySnapshot> snapshot) {
-              //     if (snapshot.hasError) {
-              //       return Text('Something went wrong');
-              //     }
-
-              //     if (snapshot.connectionState == ConnectionState.waiting) {
-              //       return CircularProgressIndicator();
-              //     }
-
-              //     List categories =
-              //         snapshot.data!.docs.map((DocumentSnapshot doc) {
-              //       Map<String, dynamic> data =
-              //           doc.data() as Map<String, dynamic>;
-              //       return data['name'];
-              //     }).toList();
-
-              //     // get logged in user's email
-              //     print(FirebaseAuth.instance.currentUser!.email);
-              //     print('categories: $categories');
-
-              //     categories.add('Add category');
-
-              //     return DropdownButton<String>(
-              //       value: selectedCategory,
-              //       items: const [
-              //         DropdownMenuItem(
-              //             value: 'Personal', child: Text('Personal')),
-              //         DropdownMenuItem(value: 'Work', child: Text('Work')),
-              //         DropdownMenuItem(value: 'School', child: Text('School')),
-              //         DropdownMenuItem(
-              //             value: 'Add category', child: Text('Add category')),
-              //       ],
-              //       onChanged: (String? newValue) {
-              //         if (newValue == 'Add category') {
-              //           addCategory();
-              //         } else {
-              //           onCategorySelected(newValue!);
-              //         }
-              //       },
-              //     );
-              //   },
-              // ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('Inbox',
-                        style: TextStyle(
-                            fontSize: 32,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold)),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 10.0, 10, 0),
+                  child: Text(
+                    'Categories',
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FilterChip(
-                      label: Text('All'),
-                      selected: selectedFilter == 'All',
-                      onSelected: (isSelected) {
-                        onFilterSelected('All');
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FilterChip(
-                      label: Text('Pending'),
-                      selected: selectedFilter == 'Pending',
-                      onSelected: (isSelected) {
-                        onFilterSelected('Pending');
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FilterChip(
-                      label: Text('Completed'),
-                      selected: selectedFilter == 'Completed',
-                      onSelected: (isSelected) {
-                        onFilterSelected('Completed');
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
               Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(userId)
-                      .collection('tasks')
-                      .where('category', isEqualTo: selectedCategory)
-                      // if selectedFilter is 'All', then don't filter
-                      .where('status',
-                          isEqualTo: selectedFilter == 'All'
-                              ? 'Pending'
-                              : selectedFilter)
-                      .snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Something went wrong');
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-
-                    if (snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No tasks'));
-                    }
-
-                    List<Map<String, dynamic>> allTasks =
-                        snapshot.data!.docs.map((DocumentSnapshot doc) {
-                      Map<String, dynamic> data =
-                          doc.data() as Map<String, dynamic>;
-                      return data;
-                    }).toList();
-
-                    return ListView.builder(
-                        itemCount: allTasks.length,
-                        itemBuilder: (context, index) {
-                          return Card(
-                            child: ListTile(
-                              leading: Icon(Icons.inbox),
-                              title: Text(allTasks[index]['title']),
-                              subtitle: Text(allTasks[index]['category']),
-                              // a checkbox after the title
-                              trailing: Checkbox(
-                                value: allTasks[index]['status'] == 'Completed'
-                                    ? true
-                                    : false,
-                                onChanged: (value) {
-                                  // update the status of the task
-                                  print(allTasks[index]);
-                                  FirebaseFirestore.instance
-                                      .collection('users')
-                                      .doc(userId)
-                                      .collection('tasks')
-                                      .doc(allTasks[index]['id'])
-                                      .update({'status': 'Completed'});
-                                },
-                              ),
-                            ),
-                          );
-                        });
-                  },
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilterChip(
+                        // border radius
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        label: Text('All'),
+                        onSelected: (bool value) {},
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilterChip(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        label: Text('All'),
+                        onSelected: (bool value) {},
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilterChip(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        label: Text('Work'),
+                        onSelected: (bool value) {},
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilterChip(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        label: Text('Personal'),
+                        onSelected: (bool value) {},
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilterChip(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                        label: Text('Shopping'),
+                        onSelected: (bool value) {},
+                      ),
+                    ),
+                    // Add more chips here
+                  ],
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton.extended(
+            onPressed: null,
+            label: Row(children: [
+              Icon(Icons.add),
+              SizedBox(width: 5),
+              Text("Add Task")
+            ])));
   }
 }
