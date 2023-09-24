@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/signin.dart';
@@ -25,55 +26,154 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void onFilterSelected(String filter) {
     setState(() {
+      print(FirebaseAuth.instance.currentUser!.email);
       selectedFilter = filter;
     });
+  }
+
+  Future<void> addCategory() async {
+    String newCategory = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController controller = TextEditingController();
+        return AlertDialog(
+          title: Text('Add category'),
+          content: TextField(
+            controller: controller,
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Add'),
+              onPressed: () {
+                Navigator.of(context).pop(controller.text);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (newCategory.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('categories')
+          .add({'name': newCategory});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hello'),
+        title: Text('Hello Nisura',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        // search
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // showSearch(context: context, delegate: DataSearch());
+            },
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Taskapolis'),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              title: Text('Sign Out'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pop(context);
+                Navigator.popUntil(context, (route) => route.isFirst);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => AuthPage()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.9,
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 1.0,
-                      blurRadius: 5.0,
-                    ),
-                  ],
-                  borderRadius: BorderRadius.circular(15.0),
-                  border: Border.all(
-                      color: Colors.blueAccent,
-                      style: BorderStyle.solid,
-                      width: 0.90),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    value: selectedCategory,
-                    items: <String>['Personal', 'Work', 'Sports']
-                        .map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
-                      onCategorySelected(value!);
-                    },
+              // StreamBuilder<QuerySnapshot>(
+              //   stream: FirebaseFirestore.instance
+              //       .collection('users')
+              //       .doc(userId)
+              //       .collection('categories')
+              //       .snapshots(),
+              //   builder: (BuildContext context,
+              //       AsyncSnapshot<QuerySnapshot> snapshot) {
+              //     if (snapshot.hasError) {
+              //       return Text('Something went wrong');
+              //     }
+
+              //     if (snapshot.connectionState == ConnectionState.waiting) {
+              //       return CircularProgressIndicator();
+              //     }
+
+              //     List categories =
+              //         snapshot.data!.docs.map((DocumentSnapshot doc) {
+              //       Map<String, dynamic> data =
+              //           doc.data() as Map<String, dynamic>;
+              //       return data['name'];
+              //     }).toList();
+
+              //     // get logged in user's email
+              //     print(FirebaseAuth.instance.currentUser!.email);
+              //     print('categories: $categories');
+
+              //     categories.add('Add category');
+
+              //     return DropdownButton<String>(
+              //       value: selectedCategory,
+              //       items: const [
+              //         DropdownMenuItem(
+              //             value: 'Personal', child: Text('Personal')),
+              //         DropdownMenuItem(value: 'Work', child: Text('Work')),
+              //         DropdownMenuItem(value: 'School', child: Text('School')),
+              //         DropdownMenuItem(
+              //             value: 'Add category', child: Text('Add category')),
+              //       ],
+              //       onChanged: (String? newValue) {
+              //         if (newValue == 'Add category') {
+              //           addCategory();
+              //         } else {
+              //           onCategorySelected(newValue!);
+              //         }
+              //       },
+              //     );
+              //   },
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Inbox',
+                        style: TextStyle(
+                            fontSize: 32,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold)),
                   ),
-                ),
+                ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -147,9 +247,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     return ListView.builder(
                         itemCount: allTasks.length,
                         itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(allTasks[index]['title']),
-                            subtitle: Text(allTasks[index]['category']),
+                          return Card(
+                            child: ListTile(
+                              leading: Icon(Icons.inbox),
+                              title: Text(allTasks[index]['title']),
+                              subtitle: Text(allTasks[index]['category']),
+                              // a checkbox after the title
+                              trailing: Checkbox(
+                                value: allTasks[index]['status'] == 'Completed'
+                                    ? true
+                                    : false,
+                                onChanged: (value) {
+                                  // update the status of the task
+                                  print(allTasks[index]);
+                                  FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(userId)
+                                      .collection('tasks')
+                                      .doc(allTasks[index]['id'])
+                                      .update({'status': 'Completed'});
+                                },
+                              ),
+                            ),
                           );
                         });
                   },
