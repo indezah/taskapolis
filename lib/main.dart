@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
 
         // material color
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Color.fromARGB(255, 0, 106, 255),
+            seedColor: Color.fromARGB(255, 18, 255, 239),
             brightness: Brightness.dark),
         useMaterial3: true,
       ),
