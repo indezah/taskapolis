@@ -1,11 +1,8 @@
-import 'dart:ffi';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
-import 'package:taskapolis/pages/home.dart';
-import 'package:taskapolis/pages/signin.dart';
 import 'package:taskapolis/reuseable_wdigets/reuseable_widget.dart';
 
 class signUpScreen extends StatefulWidget {
@@ -57,7 +54,7 @@ class _signUpScreenState extends State<signUpScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => AuthPage()),
+        MaterialPageRoute(builder: (context) => const AuthPage()),
       );
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
@@ -112,7 +109,7 @@ class _signUpScreenState extends State<signUpScreen> {
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 195, 228, 255),
+          backgroundColor: const Color.fromARGB(255, 195, 228, 255),
           elevation: 1,
           title: const Text(
             "Sign Up",
@@ -123,27 +120,27 @@ class _signUpScreenState extends State<signUpScreen> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration:
-                BoxDecoration(color: Color.fromARGB(255, 211, 229, 255)),
+                const BoxDecoration(color: Color.fromARGB(255, 211, 229, 255)),
             child: SingleChildScrollView(
                 child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 120, 20, 0),
+              padding: const EdgeInsets.fromLTRB(20, 120, 20, 0),
               child: Column(children: <Widget>[
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 reuseableTextField("Enter First Name", Icons.person_2_outlined,
                     false, _firstNameTextController),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 reuseableTextField("Enter Last Name", Icons.person_2_outlined,
                     false, _lastNameTextController),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 reuseableTextField("Enter Email", Icons.email_outlined, false,
                     _emailTextController),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 reuseableTextField("Password", Icons.lock_outline, true,
                     _passwordTextController),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 reuseableTextField("Confirm Password", Icons.lock_outline, true,
                     _confirmPasswordTextController),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 signInSignUpButton(context, false, signUp),
               ]),
             ))));

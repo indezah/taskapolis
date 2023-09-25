@@ -25,6 +25,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   late StreamSubscription<User?> user;
+  @override
   void initState() {
     super.initState();
     user = FirebaseAuth.instance.authStateChanges().listen((user) {
@@ -54,11 +55,11 @@ class _MyAppState extends State<MyApp> {
 
         // material color
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Color.fromARGB(255, 18, 255, 239),
+            seedColor: const Color.fromARGB(255, 18, 255, 239),
             brightness: Brightness.dark),
         useMaterial3: true,
       ),
-      home: AuthPage(),
+      home: const AuthPage(),
     );
   }
 }

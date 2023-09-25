@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/home.dart';
@@ -32,7 +34,7 @@ class _SigninScreenState extends State<SigninScreen> {
       Navigator.popUntil(context, (route) => route.isFirst);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
@@ -95,20 +97,20 @@ class _SigninScreenState extends State<SigninScreen> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration:
-                BoxDecoration(color: Color.fromARGB(255, 211, 229, 255)),
+                const BoxDecoration(color: Color.fromARGB(255, 211, 229, 255)),
             child: SingleChildScrollView(
                 child: Padding(
               padding: EdgeInsets.fromLTRB(
                   20, MediaQuery.of(context).size.height * 0.2, 20, 0),
               child: Column(children: <Widget>[
                 logoWidget("assets/images/logo.png"),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 reuseableTextField(
                     "Email", Icons.email_outlined, false, emailController),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 reuseableTextField(
                     "Password", Icons.lock_outline, true, passwordController),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 signInSignUpButton(context, true, signIn),
                 signUpOption()
               ]),

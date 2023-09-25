@@ -16,13 +16,13 @@ TextField reuseableTextField(String text, IconData icon, bool isPasswordType,
     obscureText: isPasswordType,
     enableSuggestions: isPasswordType,
     autocorrect: isPasswordType,
-    cursorColor: Color.fromARGB(255, 0, 20, 85),
-    style: TextStyle(color: Color.fromARGB(255, 0, 20, 85)),
+    cursorColor: const Color.fromARGB(255, 0, 20, 85),
+    style: const TextStyle(color: Color.fromARGB(255, 0, 20, 85)),
     decoration: InputDecoration(
-      border: OutlineInputBorder(),
+      border: const OutlineInputBorder(),
       labelText: text,
       prefixIcon: Icon(icon),
-      labelStyle: TextStyle(color: Color.fromARGB(255, 0, 20, 85)),
+      labelStyle: const TextStyle(color: Color.fromARGB(255, 0, 20, 85)),
       filled: true,
       fillColor: Colors.white,
     ),
@@ -42,14 +42,6 @@ Container signInSignUpButton(
           onPressed: () {
             onTap();
           },
-          child: Text(
-            isLogin ? "Sign In" : "Sign Up",
-            style: const TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
           style: ButtonStyle(
               backgroundColor: MaterialStateProperty.resolveWith(
                 (states) {
@@ -63,5 +55,13 @@ Container signInSignUpButton(
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.0),
-              )))));
+              ))),
+          child: Text(
+            isLogin ? "Sign In" : "Sign Up",
+            style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          )));
 }

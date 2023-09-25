@@ -2,13 +2,12 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/addTask.dart';
-import 'package:taskapolis/pages/auth.dart';
-import 'package:taskapolis/pages/signin.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -28,6 +27,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 64),
         child: Container(
           child: ClipRRect(
               child: BackdropFilter(
@@ -35,10 +35,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: AppBar(
               // transparent
               backgroundColor: Colors.transparent,
-              title: Text('Todo List'),
+              title: const Text('Todo List'),
               actions: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: () {
                     // Implement search functionality here
                   },
@@ -47,13 +47,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           )),
         ),
-        preferredSize: Size(MediaQuery.of(context).size.width, 64),
       ),
-      drawer: Drawer(
+      drawer: const Drawer(
           // Implement navigation drawer here
           ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           //   gradient: LinearGradient(
           //       colors: [
           //         const Color(0xFF3366FF),
@@ -65,7 +64,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           //       tileMode: TileMode.clamp),
           image: DecorationImage(
               // image opacity
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Color.fromARGB(168, 0, 0, 0), BlendMode.luminosity),
               image: AssetImage("assets/images/bg.jpg"),
               fit: BoxFit.cover),
@@ -81,16 +80,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Text('Something went wrong');
+              return const Text('Something went wrong');
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading");
+              return const Text("Loading");
             }
 
             // if empty show empty message
             if (snapshot.data!.docs.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No tasks found'),
               );
             }
@@ -129,7 +128,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 },
                 itemBuilder: (context, index) {
                   if (index == 0) {
-                    return ListTile(
+                    return const ListTile(
                       title: Text(
                         'Today',
                         style: TextStyle(
@@ -140,7 +139,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     );
                   } else if (todayTasks.isNotEmpty &&
                       index == todayTasks.length + 1) {
-                    return ListTile(
+                    return const ListTile(
                       title: Text(
                         'Later',
                         style: TextStyle(
@@ -193,7 +192,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
-                      label: Text('All'),
+                      label: const Text('All'),
                       onSelected: (bool value) {},
                     ),
                   ),
@@ -203,7 +202,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
-                      label: Text('Work'),
+                      label: const Text('Work'),
                       onSelected: (bool value) {},
                     ),
                   ),
@@ -213,7 +212,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
-                      label: Text('Personal'),
+                      label: const Text('Personal'),
                       onSelected: (bool value) {},
                     ),
                   ),
@@ -223,7 +222,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
-                      label: Text('Shopping'),
+                      label: const Text('Shopping'),
                       onSelected: (bool value) {},
                     ),
                   ),
@@ -238,10 +237,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddTask()),
+            MaterialPageRoute(builder: (context) => const AddTask()),
           );
         },
-        label: Row(
+        label: const Row(
             children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")]),
       ),
     );
@@ -265,7 +264,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       //   ],
       //   borderRadius: BorderRadius.circular(10),
       // ),
-      margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+      margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
       child: Card(
 //blurred translucent cards
         color: Theme.of(context).colorScheme.background.withOpacity(1),
@@ -308,7 +307,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     color: Theme.of(context).colorScheme.onBackground,
                   ),
                 ),
-                Text(
+                const Text(
                   'Priority',
                   style: TextStyle(
                     fontSize: 14,
