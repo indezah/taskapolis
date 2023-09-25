@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:taskapolis/pages/Settings.dart';
 import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/signin.dart';
@@ -28,6 +29,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
+        preferredSize: Size(MediaQuery.of(context).size.width, 64),
         child: Container(
           child: ClipRRect(
               child: BackdropFilter(
@@ -47,13 +49,66 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           )),
         ),
-        preferredSize: Size(MediaQuery.of(context).size.width, 64),
       ),
       drawer: Drawer(
-          // Implement navigation drawer here
-          ),
+        // Implement navigation drawer here
+        // material3 drawer
+
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            SizedBox(
+              height: 100,
+              child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                ),
+                child: Text(
+                  'Taskapolis',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onBackground,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text('Item 1'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                // Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Settings'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                // Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Sign Out'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => AuthPage()),
+                );
+              },
+            )
+          ],
+        ),
+      ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           //   gradient: LinearGradient(
           //       colors: [
           //         const Color(0xFF3366FF),
@@ -65,7 +120,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           //       tileMode: TileMode.clamp),
           image: DecorationImage(
               // image opacity
-              colorFilter: new ColorFilter.mode(
+              colorFilter: ColorFilter.mode(
                   Color.fromARGB(168, 0, 0, 0), BlendMode.luminosity),
               image: AssetImage("assets/images/bg.jpg"),
               fit: BoxFit.cover),
@@ -90,15 +145,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
             // if empty show empty message
             if (snapshot.data!.docs.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No tasks found'),
               );
             }
 
             // Sort tasks into "Today" and "Later"
+
             List<DocumentSnapshot> todayTasks = [];
+            List<DocumentSnapshot> completedTasks = [];
+
             List<DocumentSnapshot> laterTasks = [];
             DateTime now = DateTime.now();
+            completedTasks.clear();
+            todayTasks.clear();
+            laterTasks.clear();
 
             for (DocumentSnapshot document in snapshot.data!.docs) {
               Map<String, dynamic> data =
@@ -110,11 +171,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   now.year == taskDate.year &&
                   now.month == taskDate.month &&
                   now.day == taskDate.day;
-
-              if (isToday) {
-                todayTasks.add(document);
+              bool isCompleted = data['completed'];
+              if (isCompleted) {
+                completedTasks.add(document);
               } else {
-                laterTasks.add(document);
+                if (isToday) {
+                  todayTasks.add(document);
+                } else {
+                  laterTasks.add(document);
+                }
               }
             }
 
@@ -123,13 +188,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               child: ListView.separated(
                 itemCount: todayTasks.length +
                     laterTasks.length +
-                    2, // Add two for headers
+                    completedTasks.length +
+                    3, // Add three for headers
                 separatorBuilder: (BuildContext context, int index) {
                   return Container();
                 },
                 itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return ListTile(
+                  print('index: $index');
+                  print('todayTasks.length: ${todayTasks.length}');
+                  print('laterTasks.length: ${laterTasks.length}');
+                  print('completedTasks.length: ${completedTasks.length}');
+                  int todayIndex = 0;
+                  int laterIndex =
+                      todayTasks.isNotEmpty ? todayTasks.length + 1 : 0;
+                  int completedIndex = laterTasks.isNotEmpty
+                      ? laterIndex + laterTasks.length + 1
+                      : laterIndex;
+
+                  if (index == todayIndex && todayTasks.isNotEmpty) {
+                    return const ListTile(
                       title: Text(
                         'Today',
                         style: TextStyle(
@@ -138,9 +215,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                     );
-                  } else if (todayTasks.isNotEmpty &&
-                      index == todayTasks.length + 1) {
-                    return ListTile(
+                  } else if (index == laterIndex && laterTasks.isNotEmpty) {
+                    return const ListTile(
                       title: Text(
                         'Later',
                         style: TextStyle(
@@ -149,20 +225,40 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                     );
-                  } else if (index <= todayTasks.length) {
-                    // Display tasks for "Today"
-                    DocumentSnapshot document = todayTasks[index - 1];
+                  } else if (index == completedIndex &&
+                      completedTasks.isNotEmpty) {
+                    return const ListTile(
+                      title: Text(
+                        'Completed',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    );
+                  } else if (index > todayIndex &&
+                      index <= todayIndex + todayTasks.length) {
+                    DocumentSnapshot document =
+                        todayTasks[index - todayIndex - 1];
                     Map<String, dynamic> data =
                         document.data() as Map<String, dynamic>;
                     return _buildTaskListItem(document, data);
-                  } else {
-                    // Display tasks for "Later"
+                  } else if (index > laterIndex &&
+                      index <= laterIndex + laterTasks.length) {
                     DocumentSnapshot document =
-                        laterTasks[index - todayTasks.length - 2];
+                        laterTasks[index - laterIndex - 1];
+                    Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
+                    return _buildTaskListItem(document, data);
+                  } else if (index > completedIndex &&
+                      index <= completedIndex + completedTasks.length) {
+                    DocumentSnapshot document =
+                        completedTasks[index - completedIndex - 1];
                     Map<String, dynamic> data =
                         document.data() as Map<String, dynamic>;
                     return _buildTaskListItem(document, data);
                   }
+                  return null;
                 },
               ),
             );
@@ -170,16 +266,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Color.fromRGBO(0, 0, 0, 0.2),
-            //     blurRadius: 40,
-            //     offset: Offset(0, -5),
-            //   ),
-            // ],
-            // transparetn
-            color: Theme.of(context).colorScheme.background),
+        decoration:
+            BoxDecoration(color: Theme.of(context).colorScheme.background),
         height: 80.0,
         child: Column(
           children: <Widget>[
@@ -280,6 +368,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onChanged: (bool? value) {
                 // Update the completed field with the new value
                 FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(userId)
                     .collection('tasks')
                     .doc(document.id)
                     .update({'completed': value});
