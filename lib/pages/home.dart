@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,6 +7,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/Settings.dart';
 import 'package:taskapolis/pages/addTask.dart';
+import 'package:taskapolis/pages/auth.dart';
+import 'package:taskapolis/pages/editTask.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -49,11 +54,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           )),
         ),
       ),
-<<<<<<< HEAD
-      drawer: const Drawer(
-          // Implement navigation drawer here
-          ),
-=======
       drawer: Drawer(
         // Implement navigation drawer here
         // material3 drawer
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
             ),
             ListTile(
-              title: Text('Item 1'),
+              title: const Text('Item 1'),
               onTap: () {
                 // Update the state of the app
                 // ...
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               },
             ),
             ListTile(
-              title: Text('Settings'),
+              title: const Text('Settings'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -99,19 +99,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               },
             ),
             ListTile(
-              title: Text('Sign Out'),
+              title: const Text('Sign Out'),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => AuthPage()),
+                  MaterialPageRoute(builder: (context) => const AuthPage()),
                 );
               },
             )
           ],
         ),
       ),
->>>>>>> 58d29e0fd738d7db375c41fc406237de26487b8f
       body: Container(
         decoration: const BoxDecoration(
           //   gradient: LinearGradient(
@@ -199,9 +198,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   return Container();
                 },
                 itemBuilder: (context, index) {
-<<<<<<< HEAD
-                  if (index == 0) {
-=======
                   print('index: $index');
                   print('todayTasks.length: ${todayTasks.length}');
                   print('laterTasks.length: ${laterTasks.length}');
@@ -214,7 +210,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       : laterIndex;
 
                   if (index == todayIndex && todayTasks.isNotEmpty) {
->>>>>>> 58d29e0fd738d7db375c41fc406237de26487b8f
                     return const ListTile(
                       title: Text(
                         'Today',
@@ -224,12 +219,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                     );
-<<<<<<< HEAD
-                  } else if (todayTasks.isNotEmpty &&
-                      index == todayTasks.length + 1) {
-=======
                   } else if (index == laterIndex && laterTasks.isNotEmpty) {
->>>>>>> 58d29e0fd738d7db375c41fc406237de26487b8f
                     return const ListTile(
                       title: Text(
                         'Later',
@@ -349,33 +339,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTaskListItem(
-      DocumentSnapshot document, Map<String, dynamic> data) {
-    // Build and return the task list item here
-    print(data['title']);
-    return Container(
-      // margin between each task
-      // border radius
-      // decoration: BoxDecoration(
-      //   color: Color.fromARGB(255, 255, 255, 255),
-      //   boxShadow: [
-      //     BoxShadow(
-      //       color: Color.fromRGBO(0, 0, 0, 0.1),
-      //       blurRadius: 10,
-      //       offset: Offset(0, 5),
-      //     ),
-      //   ],
-      //   borderRadius: BorderRadius.circular(10),
-      // ),
+
+Widget _buildTaskListItem(DocumentSnapshot document, Map<String, dynamic> data) {
+  return GestureDetector(
+    onTap: () {
+      // Navigate to the EditTaskPage with the animation
+      Navigator.of(context).push(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return EditTaskPage(taskId: document.id);
+          },
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(0.0, 1.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOut;
+            var tween = Tween(begin: begin, end: end).chain(
+              CurveTween(curve: curve),
+            );
+
+            var offsetAnimation = animation.drive(tween);
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
+        ),
+      );
+    },
+    child: Hero(
+      tag: 'task_${document.id}', // Use a unique tag for each task
+    child: Container(
       margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
       child: Card(
-//blurred translucent cards
         color: Theme.of(context).colorScheme.background.withOpacity(1),
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        //
         child: ListTile(
             leading: Checkbox(
               value: data['completed'],
@@ -421,6 +421,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             )),
       ),
-    );
+  )
+  )
+  );
   }
 }
