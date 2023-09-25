@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/signin.dart';
 
@@ -72,6 +73,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(userId)
               .collection('tasks')
               .orderBy('priority', descending: true)
               .snapshots(),
@@ -232,7 +235,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: null,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddTask()),
+          );
+        },
         label: Row(
             children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")]),
       ),
