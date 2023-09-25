@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:taskapolis/pages/Settings.dart';
 import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/signin.dart';
@@ -49,9 +50,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           )),
         ),
       ),
-      drawer: const Drawer(
-          // Implement navigation drawer here
-          ),
+      drawer: Drawer(
+        // Implement navigation drawer here
+        // material3 drawer
+
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            SizedBox(
+              height: 100,
+              child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                ),
+                child: Text(
+                  'Taskapolis',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onBackground,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              title: Text('Item 1'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                // Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Settings'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                // Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('Sign Out'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => AuthPage()),
+                );
+              },
+            )
+          ],
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           //   gradient: LinearGradient(
