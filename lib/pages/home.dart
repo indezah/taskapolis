@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:ui';
-import 'package:intl/intl.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -505,16 +504,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        data['timestamp'] != null && data['timestamp'] != ''
-                            ? DateFormat('MMM d').format(
-                                (data['timestamp'] as Timestamp).toDate())
-                            : '',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
+                    Text(
+                      data['timestamp'] != null && data['timestamp'] != ''
+                          ? '${(data['timestamp'] as Timestamp).toDate().day}/${(data['timestamp'] as Timestamp).toDate().month}'
+                          : '',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).colorScheme.onBackground,
                       ),
+                    ),
+
                     ],
                   )),
             )));
