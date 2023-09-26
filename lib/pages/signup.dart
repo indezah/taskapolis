@@ -43,10 +43,10 @@ class _signUpScreenState extends State<signUpScreen> {
 
       print('userCredentials: $userCredentials');
       await addUserDetails(
-          userCredentials.user!.uid,
-          _firstNameTextController.text.trim(),
-          _lastNameTextController.text.trim(),
-          _emailTextController.text.trim());
+        userCredentials.user!.uid,
+        _firstNameTextController.text.trim(),
+        _lastNameTextController.text.trim(),
+      );
 
       Navigator.pop(context);
       Navigator.popUntil(context, (route) => route.isFirst);
@@ -65,14 +65,10 @@ class _signUpScreenState extends State<signUpScreen> {
   }
 
   Future addUserDetails(
-      String userid, String firstName, String lastName, String email) async {
-    DocumentReference userRef =
-        FirebaseFirestore.instance.collection('users').doc(userid);
-    return userRef.set({
-      'firstName': firstName,
-      'lastName': lastName,
-      'email': email,
-    });
+      String userid, String firstName, String lastName) async {
+    // update using  await user.updateProfile(updateInfo);
+    var user = FirebaseAuth.instance;
+    await user.currentUser!.updateProfile(displayName: firstName);
   }
 
   void errorMessage(String message, bool isUsed) {

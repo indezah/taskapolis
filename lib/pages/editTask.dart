@@ -22,12 +22,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
   void initState() {
     super.initState();
     // Fetch the task data for the given taskId
-    taskData = FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('tasks')
-        .doc(widget.taskId)
-        .get();
+    taskData =
+        FirebaseFirestore.instance.collection('tasks').doc(widget.taskId).get();
     // print(taskData.toString());
     titleController = TextEditingController();
     descriptionController = TextEditingController();
@@ -100,12 +96,9 @@ class _EditTaskPageState extends State<EditTaskPage> {
                       ),
                     ),
                     const SizedBox(height: 25),
-
                     ElevatedButton(
                       onPressed: () async {
                         await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
                             .collection('tasks')
                             .doc(widget.taskId)
                             .update({

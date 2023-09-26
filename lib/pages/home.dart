@@ -132,11 +132,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         child: StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
-              .collection('users')
-              .doc(userId)
               .collection('tasks')
-              // .where('category', isNotEqualTo: null)
-              .orderBy('timestamp', descending: true)
+              .where('uid', isEqualTo: userId)
+              // .where('category', isEqualTo: 'Personal')
+              // .where('completed', isEqualTo: true)
+              // .orderBy('priority', descending: true')
+              // .orderBy('timestamp', descending: true)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -468,9 +469,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             width: 1.0,
                             color: data['completed']
                                 ? Theme.of(context).colorScheme.onBackground
-                                : data['priority'] == 3
+                                : data['priority'] == "High"
                                     ? Colors.red
-                                    : data['priority'] == 2
+                                    : data['priority'] == "Medium"
                                         ? Colors.orange
                                         : Colors.grey)),
 
@@ -483,8 +484,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     onChanged: (bool? value) {
                       // Update the completed field with the new value
                       FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(userId)
                           .collection('tasks')
                           .doc(document.id)
                           .update({'completed': value});
