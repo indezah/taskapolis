@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/signin.dart';
+import 'package:taskapolis/pages/addTask.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -232,10 +233,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: null,
-        label: Row(
-            children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")]),
-      ),
+        onPressed: () {
+        Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddTask()), // Replace 'AddTaskPage' with the actual class name of your "Add Task" page
+    );
+  },
+  label: Row(
+    children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")],
+  ),
+),
     );
   }
 
