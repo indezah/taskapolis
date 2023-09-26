@@ -18,6 +18,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+
+
 List<String> list = <String>['One', 'Two', 'Three', 'Four'];
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
@@ -27,6 +29,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       FirebaseAuth.instance.currentUser!.uid; // Get the current user's ID
 
   bool showTodaySection = false; // Added to control section header display
+
 
   @override
   Widget build(BuildContext context) {
@@ -338,13 +341,58 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
+  // Function to show a success message dialog
+  void showSuccessEdit() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Color.fromARGB(255, 0, 0, 0), // Background color of the alert dialog
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0), // Rounded corners
+        ),
+        content: const SingleChildScrollView( // Wrap content in SingleChildScrollView
+          child: Column(
+            children: [
+              Text(
+                'Task edited successfully',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 255, 255, 255), // Content text color
+                  fontSize: 18.0, // Content text size
+                ),
+              ),
+            ],
+          ),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 10.0), // Adjust vertical padding
+        actions: <Widget>[
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: Color.fromARGB(255, 62, 172, 148), // Button background color
+              onPrimary: Colors.white, // Button text color
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the alert dialog
+            },
+            child: const Text(
+              'OK',
+              style: TextStyle(
+                fontSize: 16.0, // Button text size
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 
 
 Widget _buildTaskListItem(DocumentSnapshot document, Map<String, dynamic> data) {
   return GestureDetector(
-    onTap: () {
+    onTap: () async {
       // Navigate to the EditTaskPage with the animation
-      Navigator.of(context).push(
+      await Navigator.of(context).push(
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) {
             return EditTaskPage(taskId: document.id);
@@ -365,6 +413,9 @@ Widget _buildTaskListItem(DocumentSnapshot document, Map<String, dynamic> data) 
           },
         ),
       );
+
+      // Show the success alert when returning from EditTaskPage
+      showSuccessEdit();
     },
     child: Hero(
       tag: 'task_${document.id}', // Use a unique tag for each task
