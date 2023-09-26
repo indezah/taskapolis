@@ -96,8 +96,9 @@ class _SigninScreenState extends State<SigninScreen> {
         body: Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            decoration:
-                const BoxDecoration(color: Color.fromARGB(255, 211, 229, 255)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.background,
+            ),
             child: SingleChildScrollView(
                 child: Padding(
               padding: EdgeInsets.fromLTRB(
@@ -105,11 +106,11 @@ class _SigninScreenState extends State<SigninScreen> {
               child: Column(children: <Widget>[
                 logoWidget("assets/images/logo.png"),
                 const SizedBox(height: 20),
-                reuseableTextField(
-                    "Email", Icons.email_outlined, false, emailController),
+                reuseableTextField("Email", Icons.email_outlined, false,
+                    emailController, context),
                 const SizedBox(height: 20),
-                reuseableTextField(
-                    "Password", Icons.lock_outline, true, passwordController),
+                reuseableTextField("Password", Icons.lock_outline, true,
+                    passwordController, context),
                 const SizedBox(height: 20),
                 signInSignUpButton(context, true, signIn),
                 signUpOption()
@@ -121,8 +122,9 @@ class _SigninScreenState extends State<SigninScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text("Don't have account?",
-            style: TextStyle(color: Color.fromARGB(179, 45, 45, 45))),
+        Text("Don't have account?",
+            style:
+                TextStyle(color: Theme.of(context).colorScheme.onBackground)),
         GestureDetector(
           onTap: () {
             Navigator.push(context,
