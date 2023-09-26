@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:taskapolis/reuseable_wdigets/reuseable_widget.dart';
 
 class EditTaskPage extends StatefulWidget {
   final String taskId;
@@ -20,9 +22,12 @@ class _EditTaskPageState extends State<EditTaskPage> {
     super.initState();
     // Fetch the task data for the given taskId
     taskData = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .collection('tasks')
         .doc(widget.taskId)
         .get();
+    // print(taskData.toString());
     titleController = TextEditingController();
     descriptionController = TextEditingController();
   }
@@ -43,67 +48,56 @@ class _EditTaskPageState extends State<EditTaskPage> {
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: taskData,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           if (snapshot.hasError) {
-            return Text('Error fetching task data: ${snapshot.error}');
+            return const Center(
+              child: Text('Something went wrong'),
+            );
           }
 
-          if (snapshot.hasData && snapshot.data!.exists) {
-            final task = snapshot.data!.data() as Map<String, dynamic>;
-            final taskTitle = task['title'] as String;
-            final taskDescription = task['description'] as String;
-
+          if (snapshot.connectionState == ConnectionState.done) {
+            final data = snapshot.data!.data()!;
+            titleController.text = data['title'] ?? '';
+            descriptionController.text = data['description'] ?? '';
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextFormField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      labelText: 'Task Title',
-                    ),
-                    initialValue: taskTitle,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: descriptionController,
-                    decoration: InputDecoration(
-                      labelText: 'Task Description',
-                    ),
-                    initialValue: taskDescription,
-                    maxLines: null, // Allow multiline input
-                  ),
-                  const SizedBox(height: 16),
+                  // TextField(
+                  //   controller: titleController,
+                  //   decoration: const InputDecoration(
+                  //     labelText: 'Title',
+
+                  //   ),
+                  // ),
+                  reuseableTextField(
+                      'Title', Icons.title, false, titleController),
+                  const SizedBox(height: 20),
+                  reuseableTextField('Description', Icons.description, false,
+                      descriptionController),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
-                      // Update task data in Firestore
                       await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
                           .collection('tasks')
                           .doc(widget.taskId)
                           .update({
                         'title': titleController.text,
                         'description': descriptionController.text,
                       });
-
-                      // Optionally, navigate back to the task list or previous screen
-                      Navigator.of(context).pop();
+                      Navigator.pop(context);
                     },
-                    child: const Text('Save Changes'),
+                    child: const Text('Save'),
                   ),
                 ],
               ),
             );
-          } else {
-            // Debugging information
-            print('Snapshot: $snapshot');
-            print('Task ID: ${widget.taskId}');
-            print('Task Data: $taskData');
-            return const Center(child: Text('Task not found'));
           }
+
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
