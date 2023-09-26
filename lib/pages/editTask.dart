@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,23 +14,43 @@ class EditTaskPage extends StatefulWidget {
 }
 
 class _EditTaskPageState extends State<EditTaskPage> {
-  late Future<DocumentSnapshot<Map<String, dynamic>>> taskData;
   late TextEditingController titleController;
   late TextEditingController descriptionController;
-  late TextEditingController priorityController;
-  late TextEditingController categoryController;
+  String selectedPriority = 'Low'; // Default value for priority
+  String selectedCategory = 'Personal'; // Default value for category
+
+  final List<String> priorities = ['Low', 'Medium', 'High'];
+  final List<String> categories = [
+    'Personal',
+    'Work',
+    'Family',
+    'Health',
+    'Finance',
+    'Social',
+    'Other'
+  ];
 
   @override
   void initState() {
     super.initState();
-    // Fetch the task data for the given taskId
-    taskData =
-        FirebaseFirestore.instance.collection('tasks').doc(widget.taskId).get();
-    // print(taskData.toString());
     titleController = TextEditingController();
     descriptionController = TextEditingController();
-    priorityController = TextEditingController();
-    categoryController = TextEditingController();
+
+    // Fetch the task data for the given taskId
+    FirebaseFirestore.instance
+        .collection('tasks')
+        .doc(widget.taskId)
+        .get()
+        .then((DocumentSnapshot<Map<String, dynamic>> snapshot) {
+      final data = snapshot.data()!;
+      titleController.text = data['title'] ?? '';
+      descriptionController.text = data['description'] ?? '';
+      setState(() {
+        selectedPriority = data['priority'] ?? 'Low'; // Update selectedPriority
+        selectedCategory =
+            data['category'] ?? 'Personal'; // Update selectedCategory
+      });
+    });
   }
 
   @override
@@ -45,81 +67,82 @@ class _EditTaskPageState extends State<EditTaskPage> {
         title: const Text('Edit Task'),
       ),
       body: SingleChildScrollView(
-        child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          future: taskData,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const Center(
-                child: Text('Something went wrong'),
-              );
-            }
-
-            if (snapshot.connectionState == ConnectionState.done) {
-              final data = snapshot.data!.data()!;
-              titleController.text = data['title'] ?? '';
-              descriptionController.text = data['description'] ?? '';
-              priorityController.text = data['priority'].toString();
-              categoryController.text = data['category'] ?? '';
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Title',
-                        icon: Icon(Icons.title),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Description',
-                        icon: Icon(Icons.description),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: priorityController,
-                      decoration: const InputDecoration(
-                        labelText: 'Priority',
-                        icon: Icon(Icons.priority_high),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: categoryController,
-                      decoration: const InputDecoration(
-                        labelText: 'Category',
-                        icon: Icon(Icons.category),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await FirebaseFirestore.instance
-                            .collection('tasks')
-                            .doc(widget.taskId)
-                            .update({
-                          'title': titleController.text,
-                          'description': descriptionController.text,
-                          'priority': priorityController.text,
-                          'category': categoryController.text,
-                        });
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Save'),
-                    ),
-                  ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  icon: Icon(Icons.title),
                 ),
-              );
-            }
-
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
+              ),
+              const SizedBox(height: 25),
+              TextField(
+                controller: descriptionController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: 'Notes',
+                  icon: Icon(Icons.description),
+                ),
+              ),
+              const SizedBox(height: 25),
+              DropdownButtonFormField<String>(
+                value: selectedPriority,
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedPriority = newValue!;
+                  });
+                },
+                decoration: const InputDecoration(
+                  labelText: 'Priority',
+                  icon: Icon(Icons.priority_high),
+                ),
+                items: priorities.map((priority) {
+                  return DropdownMenuItem<String>(
+                    value: priority,
+                    child: Text(priority),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 25),
+              DropdownButtonFormField<String>(
+                value: selectedCategory,
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedCategory = newValue!;
+                  });
+                },
+                decoration: const InputDecoration(
+                  labelText: 'Category',
+                  icon: Icon(Icons.category),
+                ),
+                items: categories.map((category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 25),
+              ElevatedButton(
+                onPressed: () async {
+                  await FirebaseFirestore.instance
+                      .collection('tasks')
+                      .doc(widget.taskId)
+                      .update({
+                    'title': titleController.text,
+                    'description': descriptionController.text,
+                    'priority': selectedPriority,
+                    'category': selectedCategory,
+                  });
+                  Navigator.pop(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
         ),
       ),
     );
