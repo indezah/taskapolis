@@ -9,21 +9,28 @@ Image logoWidget(String imageName) {
   );
 }
 
-TextField reuseableTextField(String text, IconData icon, bool isPasswordType,
-    TextEditingController controller) {
+TextField reuseableTextField(
+    String text,
+    IconData icon,
+    bool isPasswordType,
+    TextEditingController controller,
+    // context
+    BuildContext context) {
   return TextField(
     controller: controller,
     obscureText: isPasswordType,
     enableSuggestions: isPasswordType,
     autocorrect: isPasswordType,
-    cursorColor: const Color.fromARGB(255, 0, 20, 85),
-    style: const TextStyle(color: Color.fromARGB(255, 0, 20, 85)),
+    cursorColor: Theme.of(context).colorScheme.onBackground,
+    style: TextStyle(
+      color: Theme.of(context).colorScheme.onBackground,
+    ),
     decoration: InputDecoration(
       border: const OutlineInputBorder(),
       labelText: text,
       prefixIcon: Icon(icon),
-      labelStyle: const TextStyle(color: Color.fromARGB(255, 0, 20, 85)),
-      filled: true,
+      labelStyle: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+      // filled: true,
       fillColor: Colors.white,
     ),
     keyboardType:
@@ -46,9 +53,9 @@ Container signInSignUpButton(
               backgroundColor: MaterialStateProperty.resolveWith(
                 (states) {
                   if (states.contains(MaterialState.pressed)) {
-                    return Colors.white;
+                    return Theme.of(context).colorScheme.secondary;
                   } else {
-                    return Colors.white;
+                    return Theme.of(context).colorScheme.primary;
                   }
                 },
               ),

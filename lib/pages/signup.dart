@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -127,19 +126,19 @@ class _signUpScreenState extends State<signUpScreen> {
               child: Column(children: <Widget>[
                 const SizedBox(height: 20),
                 reuseableTextField("Enter First Name", Icons.person_2_outlined,
-                    false, _firstNameTextController),
+                    false, _firstNameTextController, context),
                 const SizedBox(height: 20),
                 reuseableTextField("Enter Last Name", Icons.person_2_outlined,
-                    false, _lastNameTextController),
+                    false, _lastNameTextController, context),
                 const SizedBox(height: 20),
                 reuseableTextField("Enter Email", Icons.email_outlined, false,
-                    _emailTextController),
+                    _emailTextController, context),
                 const SizedBox(height: 20),
                 reuseableTextField("Password", Icons.lock_outline, true,
-                    _passwordTextController),
+                    _passwordTextController, context),
                 const SizedBox(height: 20),
                 reuseableTextField("Confirm Password", Icons.lock_outline, true,
-                    _confirmPasswordTextController),
+                    _confirmPasswordTextController, context),
                 const SizedBox(height: 20),
                 signInSignUpButton(context, false, signUp),
               ]),

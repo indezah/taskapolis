@@ -135,7 +135,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               .collection('users')
               .doc(userId)
               .collection('tasks')
-              .orderBy('priority', descending: true)
+              // .where('category', isNotEqualTo: null)
+              .orderBy('timestamp', descending: true)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -156,14 +157,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
             // Sort tasks into "Today" and "Later"
 
+            List<DocumentSnapshot> overdueTasks = [];
             List<DocumentSnapshot> todayTasks = [];
             List<DocumentSnapshot> completedTasks = [];
-
             List<DocumentSnapshot> laterTasks = [];
             DateTime now = DateTime.now();
             completedTasks.clear();
             todayTasks.clear();
             laterTasks.clear();
+            overdueTasks.clear();
 
             for (DocumentSnapshot document in snapshot.data!.docs) {
               Map<String, dynamic> data =
@@ -175,11 +177,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   now.year == taskDate.year &&
                   now.month == taskDate.month &&
                   now.day == taskDate.day;
+              bool isOverdue = taskDate != null &&
+                  taskDate.isBefore(DateTime(now.year, now.month, now.day));
               bool isCompleted = data['completed'];
               if (isCompleted) {
                 completedTasks.add(document);
               } else {
-                if (isToday) {
+                if (isOverdue) {
+                  overdueTasks.add(document);
+                } else if (isToday) {
                   todayTasks.add(document);
                 } else {
                   laterTasks.add(document);
@@ -190,26 +196,36 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             return Padding(
               padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: ListView.separated(
-                itemCount: todayTasks.length +
+                itemCount: overdueTasks.length +
+                    todayTasks.length +
                     laterTasks.length +
                     completedTasks.length +
-                    3, // Add three for headers
+                    4, // Add four for headers
                 separatorBuilder: (BuildContext context, int index) {
                   return Container();
                 },
                 itemBuilder: (context, index) {
-                  print('index: $index');
-                  print('todayTasks.length: ${todayTasks.length}');
-                  print('laterTasks.length: ${laterTasks.length}');
-                  print('completedTasks.length: ${completedTasks.length}');
-                  int todayIndex = 0;
-                  int laterIndex =
-                      todayTasks.isNotEmpty ? todayTasks.length + 1 : 0;
+                  int overdueIndex = 0;
+                  int todayIndex =
+                      overdueTasks.isNotEmpty ? overdueTasks.length + 1 : 0;
+                  int laterIndex = todayTasks.isNotEmpty
+                      ? todayIndex + todayTasks.length + 1
+                      : todayIndex;
                   int completedIndex = laterTasks.isNotEmpty
                       ? laterIndex + laterTasks.length + 1
                       : laterIndex;
 
-                  if (index == todayIndex && todayTasks.isNotEmpty) {
+                  if (index == overdueIndex && overdueTasks.isNotEmpty) {
+                    return const ListTile(
+                      title: Text(
+                        'Overdue',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    );
+                  } else if (index == todayIndex && todayTasks.isNotEmpty) {
                     return const ListTile(
                       title: Text(
                         'Today',
@@ -240,6 +256,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                     );
+                  } else if (index > overdueIndex &&
+                      index <= overdueIndex + overdueTasks.length) {
+                    DocumentSnapshot document =
+                        overdueTasks[index - overdueIndex - 1];
+                    Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
+                    return _buildTaskListItem(document, data);
                   } else if (index > todayIndex &&
                       index <= todayIndex + todayTasks.length) {
                     DocumentSnapshot document =
@@ -262,7 +285,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         document.data() as Map<String, dynamic>;
                     return _buildTaskListItem(document, data);
                   }
-                  return null;
+                  return Container(); // Return an empty container instead of null
                 },
               ),
             );
@@ -392,6 +415,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildTaskListItem(
       DocumentSnapshot document, Map<String, dynamic> data) {
+    print(data['timestamp']);
     return GestureDetector(
         onTap: () async {
           // Navigate to the EditTaskPage with the animation
@@ -424,77 +448,76 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: Hero(
             tag: 'task_${document.id}', // Use a unique tag for each task
             child: Container(
+              // add background color to task
+              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(0),
+              ),
               // margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              child: Card(
-                color: Theme.of(context).colorScheme.background.withOpacity(1),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: ListTile(
-                    leading: Checkbox(
-                      // change checkbox border color according to priority
-                      // grey checkbox if task is completed
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
+              child: ListTile(
+                  leading: Checkbox(
+                    // change checkbox border color according to priority
+                    // grey checkbox if task is completed
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
 
-                      side: MaterialStateBorderSide.resolveWith(
-                          (states) => BorderSide(
-                              width: 1.0,
-                              color: data['completed']
-                                  ? Theme.of(context).colorScheme.onBackground
-                                  : data['priority'] == 3
-                                      ? Colors.red
-                                      : data['priority'] == 2
-                                          ? Colors.orange
-                                          : Colors.grey)),
+                    side: MaterialStateBorderSide.resolveWith(
+                        (states) => BorderSide(
+                            width: 1.0,
+                            color: data['completed']
+                                ? Theme.of(context).colorScheme.onBackground
+                                : data['priority'] == 3
+                                    ? Colors.red
+                                    : data['priority'] == 2
+                                        ? Colors.orange
+                                        : Colors.grey)),
 
 // grey checkbox if task is completed
-                      fillColor: MaterialStateProperty.resolveWith((states) =>
-                          data['completed']
-                              ? Theme.of(context).colorScheme.onBackground
-                              : null),
-                      value: data['completed'],
-                      onChanged: (bool? value) {
-                        // Update the completed field with the new value
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(userId)
-                            .collection('tasks')
-                            .doc(document.id)
-                            .update({'completed': value});
-                      },
-                    ),
-                    title: Text(data['title'],
+                    fillColor: MaterialStateProperty.resolveWith((states) =>
+                        data['completed']
+                            ? Theme.of(context).colorScheme.onBackground
+                            : null),
+                    value: data['completed'],
+                    onChanged: (bool? value) {
+                      // Update the completed field with the new value
+                      FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(userId)
+                          .collection('tasks')
+                          .doc(document.id)
+                          .update({'completed': value});
+                    },
+                  ),
+                  title: Text(data['title'],
+                      style: TextStyle(
+                        // fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      )),
+                  // subtitle: Text(
+                  //   data['category'],
+                  //   style: TextStyle(
+                  //     fontSize: 14,
+                  //     color: Theme.of(context).colorScheme.onBackground,
+                  //   ),
+                  // ),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        data['timestamp'] != null && data['timestamp'] != ''
+                            ? DateFormat('MMM d').format(
+                                (data['timestamp'] as Timestamp).toDate())
+                            : '',
                         style: TextStyle(
-                          // fontWeight: FontWeight.bold,
+                          fontSize: 14,
                           color: Theme.of(context).colorScheme.onBackground,
-                        )),
-                    // subtitle: Text(
-                    //   data['category'],
-                    //   style: TextStyle(
-                    //     fontSize: 14,
-                    //     color: Theme.of(context).colorScheme.onBackground,
-                    //   ),
-                    // ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          data['timestamp'] != null
-                              ? DateFormat('MMM d').format(
-                                  (data['timestamp'] as Timestamp).toDate())
-                              : '',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).colorScheme.onBackground,
-                          ),
                         ),
-                      ],
-                    )),
-              ),
+                      ),
+                    ],
+                  )),
             )));
   }
 }
