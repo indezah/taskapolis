@@ -15,8 +15,15 @@ class _EditTaskPageState extends State<EditTaskPage> {
   late Future<DocumentSnapshot<Map<String, dynamic>>> taskData;
   late TextEditingController titleController;
   late TextEditingController descriptionController;
-  late TextEditingController priorityController;
+  String priorityValue = "1"; // Store the selected priority as a String
   late TextEditingController categoryController;
+
+  // Define the available priority options and their corresponding values
+  final List<String> priorityOptions = ['Low', 'Medium', 'High'];
+  final Map<String, String> priorityValues = {'Low': '1', 'Medium': '2', 'High': '3'};
+
+  // Define the available category options
+  final List<String> categoryOptions = ['Personal', 'Work', 'Health', 'Family', 'Finance', 'Social'];
 
   @override
   void initState() {
@@ -28,10 +35,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
         .collection('tasks')
         .doc(widget.taskId)
         .get();
-    // print(taskData.toString());
     titleController = TextEditingController();
     descriptionController = TextEditingController();
-    priorityController = TextEditingController();
     categoryController = TextEditingController();
   }
 
@@ -62,7 +67,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
               final data = snapshot.data!.data()!;
               titleController.text = data['title'] ?? '';
               descriptionController.text = data['description'] ?? '';
-              priorityController.text = data['priority'].toString();
+              priorityValue = data['priority'] ?? '1'; // Initialize priorityValue
               categoryController.text = data['category'] ?? '';
               return Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -78,26 +83,51 @@ class _EditTaskPageState extends State<EditTaskPage> {
                     const SizedBox(height: 25),
                     TextField(
                       controller: descriptionController,
+                      maxLines: 4,
                       decoration: const InputDecoration(
                         labelText: 'Description',
                         icon: Icon(Icons.description),
                       ),
                     ),
                     const SizedBox(height: 25),
-                    TextField(
-                      controller: priorityController,
+                    DropdownButtonFormField<String>(
+                      value: priorityValue,
                       decoration: const InputDecoration(
                         labelText: 'Priority',
                         icon: Icon(Icons.priority_high),
                       ),
+                      items: priorityValues.entries.map((entry) {
+                        return DropdownMenuItem<String>(
+                          value: entry.value,
+                          child: Text(entry.key),
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        if (value != null) {
+                          setState(() {
+                            priorityValue = value;
+                          });
+                        }
+                      },
                     ),
                     const SizedBox(height: 25),
-                    TextField(
-                      controller: categoryController,
+                    DropdownButtonFormField<String>(
+                      value: categoryController.text,
                       decoration: const InputDecoration(
                         labelText: 'Category',
                         icon: Icon(Icons.category),
                       ),
+                      items: categoryOptions.map((String option) {
+                        return DropdownMenuItem<String>(
+                          value: option,
+                          child: Text(option),
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          categoryController.text = value ?? '';
+                        });
+                      },
                     ),
                     const SizedBox(height: 25),
 
@@ -111,7 +141,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                             .update({
                           'title': titleController.text,
                           'description': descriptionController.text,
-                          'priority': priorityController.text,
+                          'priority': priorityValue, // Use priorityValue
                           'category': categoryController.text,
                         });
                         Navigator.pop(context);
