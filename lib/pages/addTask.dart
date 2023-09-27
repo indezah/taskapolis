@@ -19,8 +19,7 @@ class _AddTaskState extends State<AddTask> {
   final TextEditingController notesController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-
-String timeOfDayToString(TimeOfDay timeOfDay) {
+  String timeOfDayToString(TimeOfDay timeOfDay) {
     return '${timeOfDay.hour}:${timeOfDay.minute}';
   }
 
@@ -71,58 +70,49 @@ String timeOfDayToString(TimeOfDay timeOfDay) {
       }
 
       // Create a map with the task data
-       final Timestamp dueDateTimestamp = Timestamp.fromDate(dueDate!);
-    final dueTimeAsString = timeOfDayToString(dueTime!);
+      final Timestamp dueDateTimestamp = Timestamp.fromDate(dueDate!);
+      final dueTimeAsString = timeOfDayToString(dueTime!);
 
       Map<String, dynamic> taskData = {
         'category': selectedCategory,
-          'completed': false,
-          'notes': notesController.text.isEmpty ? '' : notesController.text,
-          'priority': selectedPriority,
-          'timestamp': dueDateTimestamp,
-          'duetime': dueTimeAsString, // Store the TimeOfDay as a string
-          // 'timestamp': FieldValue.serverTimestamp(),
-          'title': titleController.text,
-          'uid': user.uid,
-          'isReminderSet': isReminderSet,
+        'completed': false,
+        'notes': notesController.text.isEmpty ? '' : notesController.text,
+        'priority': selectedPriority,
+        'timestamp': dueDateTimestamp,
+        'duetime': dueTimeAsString, // Store the TimeOfDay as a string
+        // 'timestamp': FieldValue.serverTimestamp(),
+        'title': titleController.text,
+        'uid': user.uid,
+        'isReminderSet': isReminderSet,
       };
 
       // Add the task data to Firestore under the 'tasks' collection and the user's ID
       try {
-        await FirebaseFirestore.instance
-            .collection('tasks')
-            .add(taskData);
+        await FirebaseFirestore.instance.collection('tasks').add(taskData);
       } catch (e) {
-        // return (e);
+        print(e);
       }
 
       // Navigate to the home page
-      Navigator.of(context).pop(); // Close the current screen and go back to the previous one (home page)
+      Navigator.of(context)
+          .pop(); // Close the current screen and go back to the previous one (home page)
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: Text('Add Task'),
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Task'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Title',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 SizedBox(height: 10.0),
                 TextFormField(
                   controller: titleController,
@@ -133,19 +123,14 @@ String timeOfDayToString(TimeOfDay timeOfDay) {
                     return null;
                   },
                   decoration: InputDecoration(
+                    labelText: 'Title',
                     border: OutlineInputBorder(),
                   ),
                 ),
                 SizedBox(height: 20.0),
-                Text(
-                  'Note',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 SizedBox(height: 10.0),
                 TextFormField(
+                  maxLines: 5,
                   controller: notesController,
                   validator: (value) {
                     // Add validation logic for the note field if needed
@@ -153,6 +138,7 @@ String timeOfDayToString(TimeOfDay timeOfDay) {
                   },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
+                    labelText: 'Notes',
                   ),
                 ),
                 SizedBox(height: 20.0),
@@ -240,31 +226,32 @@ String timeOfDayToString(TimeOfDay timeOfDay) {
                         value: selectedPriority,
                         onChanged: (String? newValue) {
                           setState(() {
-                            selectedPriority = newValue ?? "High"; // Assign a default value if null
+                            selectedPriority = newValue ??
+                                "High"; // Assign a default value if null
                           });
                         },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Priority is required';
-            }
-            return null;
-          },
-          items: <DropdownMenuItem<String>>[
-            DropdownMenuItem<String>(
-              value: "High",
-              child: Text('High'),
-            ),
-            DropdownMenuItem<String>(
-              value: "Medium",
-              child: Text('Medium'),
-            ),
-            DropdownMenuItem<String>(
-              value: "Low",
-              child: Text('Low'),
-            ),
-          ],
-        ),
-      ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Priority is required';
+                          }
+                          return null;
+                        },
+                        items: <DropdownMenuItem<String>>[
+                          DropdownMenuItem<String>(
+                            value: "High",
+                            child: Text('High'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Medium",
+                            child: Text('Medium'),
+                          ),
+                          DropdownMenuItem<String>(
+                            value: "Low",
+                            child: Text('Low'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(height: 20.0),
@@ -358,13 +345,12 @@ String timeOfDayToString(TimeOfDay timeOfDay) {
                   ],
                 ),
                 SizedBox(height: 20.0),
-               
                 Center(
-                child: ElevatedButton(
-                  onPressed: _saveTask,
-                  child: Text('Save Task'),
+                  child: ElevatedButton(
+                    onPressed: _saveTask,
+                    child: Text('Save Task'),
+                  ),
                 ),
-              ),
               ],
             ),
           ),
