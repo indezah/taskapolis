@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
                 );
                 // Update the state of the app
                 // ...
@@ -368,7 +368,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Color.fromARGB(
+          backgroundColor: const Color.fromARGB(
               255, 0, 0, 0), // Background color of the alert dialog
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0), // Rounded corners
@@ -393,9 +393,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Color.fromARGB(
-                    255, 62, 172, 148), // Button background color
-                onPrimary: Colors.white, // Button text color
+                foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(
+                    255, 62, 172, 148), // Button text color
               ),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the alert dialog
@@ -519,3 +518,4 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             )));
   }
 }
+

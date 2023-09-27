@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -28,12 +30,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
       body: ListView(
         children: [
           ListTile(
-            title: Text('Seed Color'),
+            title: const Text('Seed Color'),
             trailing: CircleAvatar(
               backgroundColor: _seedColor,
             ),
@@ -42,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: Text('Select Seed Color'),
+                    title: const Text('Select Seed Color'),
                     content: SingleChildScrollView(
                       child: ColorPicker(
                         pickerColor: _seedColor,
@@ -55,7 +57,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     actions: [
                       TextButton(
-                        child: Text('OK'),
+                        child: const Text('OK'),
                         onPressed: () {
                           Navigator.of(context).pop();
                           _updateColorScheme();

@@ -41,6 +41,7 @@ dependencies:
   provider: ^6.0.5
   flutter_colorpicker: ^1.0.3
   intl: ^0.18.1
+  firebase_messaging: ^14.6.8
 
 dev_dependencies:
   flutter_test:

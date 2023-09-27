@@ -104,6 +104,24 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "firebase_messaging",
+      "rootUri": "file:///C:/Users/User/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_messaging-14.6.8",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "firebase_messaging_platform_interface",
+      "rootUri": "file:///C:/Users/User/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_messaging_platform_interface-4.5.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
+      "name": "firebase_messaging_web",
+      "rootUri": "file:///C:/Users/User/AppData/Local/Pub/Cache/hosted/pub.dev/firebase_messaging_web-3.5.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "flutter",
       "rootUri": "file:///D:/3rd%20Year/SCS%203212%20-%20Mobile%20Application%20Development/flutter/packages/flutter",
       "packageUri": "lib/",
@@ -136,6 +154,12 @@
     {
       "name": "http_parser",
       "rootUri": "file:///C:/Users/User/AppData/Local/Pub/Cache/hosted/pub.dev/http_parser-4.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "intl",
+      "rootUri": "file:///C:/Users/User/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.18.1",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -260,7 +284,7 @@
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2023-09-25T19:33:30.936291Z",
+  "generated": "2023-09-27T10:35:26.852514Z",
   "generator": "pub",
   "generatorVersion": "3.1.1"
 }
