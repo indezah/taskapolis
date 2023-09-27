@@ -10,6 +10,7 @@ import 'package:taskapolis/pages/Settings.dart';
 import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/editTask.dart';
+import 'package:taskapolis/pages/search.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       FirebaseAuth.instance.currentUser!.uid; // Get the current user's ID
 
   bool showTodaySection = false; // Added to control section header display
+  String selectedChip = 'All'; // Initialize it with 'All'
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +49,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   icon: const Icon(Icons.search),
                   onPressed: () {
                     // Implement search functionality here
+                    // Show search screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SearchScreen(
+                              currentUserId:
+                                  FirebaseAuth.instance.currentUser!.uid)),
+                    );
                   },
                 ),
               ],
@@ -134,10 +144,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           stream: FirebaseFirestore.instance
               .collection('tasks')
               .where('uid', isEqualTo: userId)
-              // .where('category', isEqualTo: 'Personal')
-              // .where('completed', isEqualTo: true)
-              // .orderBy('priority', descending: true')
-              // .orderBy('timestamp', descending: true)
+              .where('category',
+                  isEqualTo: selectedFilter == "All"
+                      ? ["Personal", "Work", "Educational"]
+                      : selectedFilter)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -306,41 +316,46 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FilterChip(
+                      selected: selectedFilter == 'All',
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
                       label: const Text('All'),
-                      onSelected: (bool value) {},
+                      onSelected: (bool value) {
+                        setState(() {
+                          selectedFilter = 'All';
+                        });
+                      },
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FilterChip(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      label: const Text('Work'),
-                      onSelected: (bool value) {},
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FilterChip(
+                      selected: selectedFilter == 'Personal',
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
                       label: const Text('Personal'),
-                      onSelected: (bool value) {},
+                      onSelected: (bool value) {
+                        setState(() {
+                          selectedFilter = 'Personal';
+                        });
+                      },
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FilterChip(
+                      selected: selectedFilter == 'Work',
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
-                      label: const Text('Shopping'),
-                      onSelected: (bool value) {},
+                      label: const Text('Work'),
+                      onSelected: (bool value) {
+                        setState(() {
+                          selectedFilter = 'Work';
+                        });
+                      },
                     ),
                   ),
                   // Add more chips here
