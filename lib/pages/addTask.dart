@@ -9,7 +9,7 @@ class AddTask extends StatefulWidget {
 
 class _AddTaskState extends State<AddTask> {
   String selectedCategory = 'Work';
-  int selectedPriority = 1; // Initialize with a default value
+  String selectedPriority = "High"; // Initialize with a default value
   bool isReminderSet = false;
   DateTime? selectedDueDate; // Declare as class-level variables
   TimeOfDay? selectedDueTime;
@@ -18,6 +18,11 @@ class _AddTaskState extends State<AddTask> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+
+String timeOfDayToString(TimeOfDay timeOfDay) {
+    return '${timeOfDay.hour}:${timeOfDay.minute}';
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -66,22 +71,25 @@ class _AddTaskState extends State<AddTask> {
       }
 
       // Create a map with the task data
+       final Timestamp dueDateTimestamp = Timestamp.fromDate(dueDate!);
+    final dueTimeAsString = timeOfDayToString(dueTime!);
+
       Map<String, dynamic> taskData = {
         'category': selectedCategory,
-        'completed': false,
-        'notes': notesController.text.isEmpty ? '' : notesController.text,
-        // if(selectedPriority)
-        'priority': selectedPriority,
-        'timestamp': FieldValue.serverTimestamp(),
-        'title': titleController.text,
-        'uid': user.uid,
+          'completed': false,
+          'notes': notesController.text.isEmpty ? '' : notesController.text,
+          'priority': selectedPriority,
+          'timestamp': dueDateTimestamp,
+          'duetime': dueTimeAsString, // Store the TimeOfDay as a string
+          // 'timestamp': FieldValue.serverTimestamp(),
+          'title': titleController.text,
+          'uid': user.uid,
+          'isReminderSet': isReminderSet,
       };
 
       // Add the task data to Firestore under the 'tasks' collection and the user's ID
       try {
         await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
             .collection('tasks')
             .add(taskData);
       } catch (e) {
@@ -228,35 +236,35 @@ class _AddTaskState extends State<AddTask> {
                     ),
                     Expanded(
                       flex: 2,
-                      child: DropdownButtonFormField<int>(
+                      child: DropdownButtonFormField<String>(
                         value: selectedPriority,
-                        onChanged: (int? newValue) {
+                        onChanged: (String? newValue) {
                           setState(() {
-                            selectedPriority = newValue ?? 1;
+                            selectedPriority = newValue ?? "High"; // Assign a default value if null
                           });
                         },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Priority is required';
-                          }
-                          return null;
-                        },
-                        items: <DropdownMenuItem<int>>[
-                          DropdownMenuItem<int>(
-                            value: 1,
-                            child: Text('1'),
-                          ),
-                          DropdownMenuItem<int>(
-                            value: 2,
-                            child: Text('2'),
-                          ),
-                          DropdownMenuItem<int>(
-                            value: 3,
-                            child: Text('3'),
-                          ),
-                        ],
-                      ),
-                    ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Priority is required';
+            }
+            return null;
+          },
+          items: <DropdownMenuItem<String>>[
+            DropdownMenuItem<String>(
+              value: "High",
+              child: Text('High'),
+            ),
+            DropdownMenuItem<String>(
+              value: "Medium",
+              child: Text('Medium'),
+            ),
+            DropdownMenuItem<String>(
+              value: "Low",
+              child: Text('Low'),
+            ),
+          ],
+        ),
+      ),
                   ],
                 ),
                 SizedBox(height: 20.0),
@@ -350,10 +358,13 @@ class _AddTaskState extends State<AddTask> {
                   ],
                 ),
                 SizedBox(height: 20.0),
-                ElevatedButton(
+               
+                Center(
+                child: ElevatedButton(
                   onPressed: _saveTask,
                   child: Text('Save Task'),
                 ),
+              ),
               ],
             ),
           ),
