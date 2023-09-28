@@ -73,6 +73,8 @@ class _AddTaskState extends State<AddTask> {
       }
 
       // Create a map with the task data
+      final Timestamp dueDateTimestamp = Timestamp.fromDate(dueDate!);
+      final dueTimeAsString = timeOfDayToString(dueTime!);
        final DateTime dueDateTime = DateTime(
           dueDate!.year,
           dueDate!.month,
@@ -89,8 +91,8 @@ class _AddTaskState extends State<AddTask> {
         'completed': false,
         'notes': notesController.text.isEmpty ? '' : notesController.text,
         'priority': selectedPriority,
-        'timestamp': dueDateTime,
-        // 'duetime': dueTimeAsString, // Store the TimeOfDay as a string
+        'timestamp': dueDateTimestamp,
+        'duetime': dueTimeAsString, // Store the TimeOfDay as a string
         // 'timestamp': FieldValue.serverTimestamp(),
         'title': titleController.text,
         'uid': user.uid,
