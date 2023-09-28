@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart'; // Add this import for DateFormat
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
-
 class AddTask extends StatefulWidget {
   @override
   _AddTaskState createState() => _AddTaskState();
@@ -26,91 +25,78 @@ class _AddTaskState extends State<AddTask> {
     return '${timeOfDay.hour}:${timeOfDay.minute}';
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDueDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
-    );
-    if (pickedDate != null) {
-      setState(() {
-        selectedDueDate = pickedDate;
-        dueDate = pickedDate; // Update dueDate with the selected date
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
+Future<void> _selectDateAndTime(BuildContext context) async {
+  final DateTime now = DateTime.now();
+  final DateTime? pickedDate = await showDatePicker(
+    context: context,
+    initialDate: selectedDueDate ?? now,
+    firstDate: now,
+    lastDate: DateTime(2101),
+  );
+  if (pickedDate != null) {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: selectedDueTime ?? TimeOfDay.now(),
     );
     if (pickedTime != null) {
       setState(() {
+        selectedDueDate = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+        dueDate = selectedDueDate;
         selectedDueTime = pickedTime;
-        dueTime = pickedTime; // Update dueTime with the selected time
+        dueTime = selectedDueTime;
       });
     }
   }
+}
 
   void _saveTask() async {
-    if (_formKey.currentState!.validate()) {
-      if (dueDate == null || dueTime == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Please select Due Date and Due Time.'),
-          ),
-        );
-        return;
-      }
+  if (_formKey.currentState!.validate()) {
+    if (selectedDueDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select Due Date and Time.'),
+        ),
+      );
+      return;
+    }
 
-      // Get the current user ID from Firebase Authentication
-      final User? user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        // Handle the case where the user is not logged in
-        return;
-      }
-
-      // Create a map with the task data
-      final Timestamp dueDateTimestamp = Timestamp.fromDate(dueDate!);
-      final dueTimeAsString = timeOfDayToString(dueTime!);
-       final DateTime dueDateTime = DateTime(
-          dueDate!.year,
-          dueDate!.month,
-          dueDate!.day,
-          dueTime!.hour,
-          dueTime!.minute,
-    );
+    // Get the current user ID from Firebase Authentication
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      // Handle the case where the user is not logged in
+      return;
+    }
 
     // Create a map with the task data
-    // final dueTimeAsString = timeOfDayToString(dueTime!);
+    Map<String, dynamic> taskData = {
+      'category': selectedCategory,
+      'completed': false,
+      'notes': notesController.text.isEmpty ? '' : notesController.text,
+      'priority': selectedPriority,
+      'timestamp': Timestamp.fromDate(selectedDueDate!), // Use selectedDueDate
+      'title': titleController.text,
+      'uid': user.uid,
+      'isReminderSet': isReminderSet,
+    };
 
-      Map<String, dynamic> taskData = {
-        'category': selectedCategory,
-        'completed': false,
-        'notes': notesController.text.isEmpty ? '' : notesController.text,
-        'priority': selectedPriority,
-        'timestamp': dueDateTime,
-        'duetime': dueTimeAsString, // Store the TimeOfDay as a string
-        // 'timestamp': FieldValue.serverTimestamp(),
-        'title': titleController.text,
-        'uid': user.uid,
-        'isReminderSet': isReminderSet,
-      };
-
-      // Add the task data to Firestore under the 'tasks' collection and the user's ID
-      try {
-        await FirebaseFirestore.instance.collection('tasks').add(taskData);
-      } catch (e) {
-        print(e);
-      }
-
-      // Navigate to the home page
-      Navigator.of(context)
-          .pop(); // Close the current screen and go back to the previous one (home page)
+    // Add the task data to Firestore under the 'tasks' collection and the user's ID
+    try {
+      await FirebaseFirestore.instance.collection('tasks').add(taskData);
+    } catch (e) {
+      print(e);
     }
+
+    // Navigate to the home page
+    Navigator.of(context).pop(); // Close the current screen and go back to the previous one (home page)
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -146,8 +132,7 @@ class _AddTaskState extends State<AddTask> {
                   maxLines: 5,
                   controller: notesController,
                   validator: (value) {
-                    // Add validation logic for the note field if needed
-                    return null; // Return null if no validation required
+                    return null; 
                   },
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
@@ -296,67 +281,37 @@ class _AddTaskState extends State<AddTask> {
                 ),
                 SizedBox(height: 20.0),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        'Due Date',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: TextButton(
-                        onPressed: () {
-                          _selectDate(context);
-                        },
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 2,
                         child: Text(
-                          dueDate != null
-                              ? '${dueDate!.toLocal()}'.split(' ')[0]
-                              : 'Select Date',
+                          'Due Date and Time', // Update the label
                           style: TextStyle(
                             fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        'Due Time',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: TextButton(
-                        onPressed: () {
-                          _selectTime(context);
-                        },
-                        child: Text(
-                          dueTime != null
-                              ? dueTime!.format(context)
-                              : 'Select Time',
-                          style: TextStyle(
-                            fontSize: 16.0,
+                      Expanded(
+                        flex: 3,
+                        child: TextButton(
+                          onPressed: () {
+                            _selectDateAndTime(context); // Use _selectDateAndTime
+                          },
+                          child: Text(
+                            selectedDueDate != null && selectedDueTime != null
+                                ? DateFormat('MMM d, y H:mm').format(selectedDueDate!) // Format as desired
+                                : 'Select Date and Time',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+      ),
+
                 SizedBox(height: 20.0),
                 Center(
                   child: ElevatedButton(
