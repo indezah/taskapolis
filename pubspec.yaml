@@ -41,6 +41,11 @@ dependencies:
   provider: ^6.0.5
   flutter_colorpicker: ^1.0.3
   intl: ^0.18.1
+  path_provider: ^2.1.1
+  file_picker: ^5.5.0
+  csv: ^5.0.2
+  permission_handler: ^11.0.0
+  shared_preferences: ^2.2.1
 
 dev_dependencies:
   flutter_test:

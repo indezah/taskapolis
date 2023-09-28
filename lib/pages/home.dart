@@ -6,9 +6,11 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'package:taskapolis/pages/Settings.dart';
 import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/auth.dart';
+
 import 'package:taskapolis/pages/editTask.dart';
 import 'package:taskapolis/pages/search.dart';
 
@@ -42,7 +44,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: AppBar(
               // transparent
               backgroundColor: Colors.transparent,
-              title: const Text('Todo List'),
+              title: Center(
+                child: Text(
+                    'Hello ${FirebaseAuth.instance.currentUser!.displayName?.split(" ")[0]}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onBackground,
+                    )),
+              ),
               actions: <Widget>[
                 IconButton(
                   icon: const Icon(Icons.search),
@@ -71,36 +79,66 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           padding: EdgeInsets.zero,
           children: <Widget>[
             SizedBox(
-              height: 100,
               child: DrawerHeader(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.background,
                 ),
-                child: Text(
-                  'Taskapolis',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground,
-                    fontSize: 24,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'TASKAPOLIS',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground,
+                        fontFamily: 'Space Grotesk',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          FirebaseAuth.instance.currentUser!.displayName!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onBackground,
+                            fontSize: 16,
+                            // fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Text(
+                          '${FirebaseAuth.instance.currentUser!.email}',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onBackground,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
             ListTile(
-              title: const Text('Item 1'),
-              onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                // Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Settings'),
+              title: const Text('Import/Export Data',
+                  style: TextStyle(fontFamily: 'Inter')),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SettingsPage()),
                 );
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+              },
+            ),
+            ListTile(
+              title: const Text('Help'),
+              onTap: () {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
@@ -116,26 +154,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   MaterialPageRoute(builder: (context) => const AuthPage()),
                 );
               },
-            )
+            ),
+            ListTile(
+              title: const Text('About'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                // Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),
       body: Container(
         decoration: BoxDecoration(
-          //   gradient: LinearGradient(
-          //       colors: [
-          //         const Color(0xFF3366FF),
-          //         Color.fromARGB(255, 102, 0, 255),
-          //       ],
-          //       begin: const FractionalOffset(0.0, 0.0),
-          //       end: const FractionalOffset(1.0, 0.0),
-          //       stops: [0.0, 1.0],
-          //       tileMode: TileMode.clamp),
           image: DecorationImage(
               // image opacity
               colorFilter: ColorFilter.mode(
                   Color.fromARGB(168, 0, 0, 0), BlendMode.luminosity),
-              image: AssetImage("assets/images/bg.jpg"),
+              image: AssetImage('assets/images/bg1.jpg'),
               fit: BoxFit.cover),
           // iamge opacity
         ),
@@ -161,12 +199,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             // if empty show empty message
             if (snapshot.data!.docs.isEmpty) {
               return Center(
-                  child: Text('Add a task to $selectedFilter',
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Add a task to ',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      )),
+                  Text('$selectedFilter',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.onBackground,
-                      )));
+                      )),
+                ],
+              ));
             }
 
             // Sort tasks into "Today" and "Later"

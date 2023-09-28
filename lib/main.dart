@@ -4,6 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:provider/provider.dart';
+
 import 'package:taskapolis/pages/auth.dart';
 
 void main() async {
@@ -12,7 +16,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(
+    MyApp(),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -48,14 +54,14 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Taskapolis',
       theme: ThemeData(
-        fontFamily: 'Inter',
+        fontFamily: 'SpaceGrotesk',
         // dark theme
         // brightness: Brightness.dark,
         // light
 
         // material color
         colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 18, 255, 239),
+            seedColor: const Color.fromARGB(255, 42, 102, 255),
             brightness: Brightness.dark),
         useMaterial3: true,
       ),
