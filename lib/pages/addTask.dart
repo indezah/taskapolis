@@ -91,7 +91,7 @@ class _AddTaskState extends State<AddTask> {
         'completed': false,
         'notes': notesController.text.isEmpty ? '' : notesController.text,
         'priority': selectedPriority,
-        'timestamp': dueDateTimestamp,
+        'timestamp': dueDateTime,
         'duetime': dueTimeAsString, // Store the TimeOfDay as a string
         // 'timestamp': FieldValue.serverTimestamp(),
         'title': titleController.text,
