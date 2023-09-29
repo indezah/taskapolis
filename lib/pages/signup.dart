@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/reuseable_wdigets/reuseable_widget.dart';
@@ -34,6 +33,15 @@ class _signUpScreenState extends State<signUpScreen> {
       if (_passwordTextController.text != _confirmPasswordTextController.text) {
         Navigator.pop(context);
         errorMessage('Passwords do not match', false);
+        return;
+      } else if (_firstNameTextController.text.isEmpty ||
+          _lastNameTextController.text.isEmpty) {
+        Navigator.pop(context);
+        errorMessage('Please enter your first and last name', false);
+        return;
+      } else if (_emailTextController.text.isEmpty) {
+        Navigator.pop(context);
+        errorMessage('Please enter your email', false);
         return;
       }
       var userCredentials = await FirebaseAuth.instance
@@ -88,10 +96,6 @@ class _signUpScreenState extends State<signUpScreen> {
                   // Navigator.popUntil(context, (route) => route.isFirst);
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => SigninScreen()),
-                  // );
                 },
               ),
             ]);
