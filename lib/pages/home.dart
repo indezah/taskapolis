@@ -13,6 +13,7 @@ import 'package:taskapolis/pages/auth.dart';
 
 import 'package:taskapolis/pages/editTask.dart';
 import 'package:taskapolis/pages/search.dart';
+import 'package:taskapolis/pages/signin.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -555,11 +556,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddTask()),
+            MaterialPageRoute(
+                builder: (context) =>
+                    AddTask()), // Replace 'AddTaskPage' with the actual class name of your "Add Task" page
           );
         },
-        label: const Row(
-            children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")]),
+        label: Row(
+          children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")],
+        ),
       ),
     );
   }
