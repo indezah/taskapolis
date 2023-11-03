@@ -12,7 +12,6 @@ import 'package:taskapolis/pages/auth.dart';
 
 import 'package:taskapolis/pages/editTask.dart';
 import 'package:taskapolis/pages/search.dart';
-import 'package:taskapolis/pages/signin.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -96,7 +95,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         fontSize: 24,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     Column(
@@ -129,7 +128,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  MaterialPageRoute(builder: (context) =>  const SettingsPage()),
                 );
                 // Update the state of the app
                 // ...
@@ -168,7 +167,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
               // image opacity
               colorFilter: ColorFilter.mode(
@@ -207,7 +206,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         fontSize: 18,
                         color: Theme.of(context).colorScheme.onBackground,
                       )),
-                  Text('$selectedFilter',
+                  Text(selectedFilter,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -241,12 +240,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 DateTime? taskDate = data['timestamp'] != null
                     ? (data['timestamp'] as Timestamp).toDate()
                     : null;
-                bool isToday = taskDate != null &&
-                    now.year == taskDate.year &&
-                    now.month == taskDate.month &&
-                    now.day == taskDate.day;
-                bool isOverdue = taskDate != null &&
-                    taskDate.isBefore(DateTime(now.year, now.month, now.day));
+                bool isToday = now.year == taskDate?.year &&
+                    now.month == taskDate?.month &&
+                    now.day == taskDate?.day;
+                bool isOverdue = taskDate!.isBefore(DateTime(now.year, now.month, now.day));
                 bool isCompleted = data['completed'];
                 if (isCompleted) {
                   completedTasks.add(document);
@@ -264,12 +261,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   DateTime? taskDate = data['timestamp'] != null
                       ? (data['timestamp'] as Timestamp).toDate()
                       : null;
-                  bool isToday = taskDate != null &&
-                      now.year == taskDate.year &&
+                  bool isToday = now.year == taskDate!.year &&
                       now.month == taskDate.month &&
                       now.day == taskDate.day;
-                  bool isOverdue = taskDate != null &&
-                      taskDate.isBefore(DateTime(now.year, now.month, now.day));
+                  bool isOverdue = taskDate.isBefore(DateTime(now.year, now.month, now.day));
                   bool isCompleted = data['completed'];
                   if (isCompleted) {
                     completedTasks.add(document);
@@ -557,10 +552,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    AddTask()), // Replace 'AddTaskPage' with the actual class name of your "Add Task" page
+                    const AddTask()), // Replace 'AddTaskPage' with the actual class name of your "Add Task" page
           );
         },
-        label: Row(
+        label: const Row(
           children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")],
         ),
       ),
