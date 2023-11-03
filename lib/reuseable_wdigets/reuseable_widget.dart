@@ -4,8 +4,8 @@ Image logoWidget(String imageName) {
   return Image.asset(
     imageName,
     fit: BoxFit.fitWidth,
-    width: 240,
-    height: 240,
+    width: 200,
+    height: 200,
   );
 }
 
@@ -28,7 +28,7 @@ TextField reuseableTextField(
     decoration: InputDecoration(
       border: const OutlineInputBorder(),
       labelText: text,
-      prefixIcon: Icon(icon),
+      // prefixIcon: Icon(icon),
       labelStyle: TextStyle(color: Theme.of(context).colorScheme.onBackground),
       // filled: true,
       fillColor: Colors.white,

@@ -1,3 +1,5 @@
+// import 'dart:ffi';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
@@ -34,6 +36,15 @@ class _signUpScreenState extends State<signUpScreen> {
         Navigator.pop(context);
         errorMessage('Passwords do not match', false);
         return;
+      } else if (_firstNameTextController.text.isEmpty ||
+          _lastNameTextController.text.isEmpty) {
+        Navigator.pop(context);
+        errorMessage('Please enter your first and last name', false);
+        return;
+      } else if (_emailTextController.text.isEmpty) {
+        Navigator.pop(context);
+        errorMessage('Please enter your email', false);
+        return;
       }
       var userCredentials = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -67,7 +78,7 @@ class _signUpScreenState extends State<signUpScreen> {
       String userid, String firstName, String lastName) async {
     // update using  await user.updateProfile(updateInfo);
     var user = FirebaseAuth.instance;
-    await user.currentUser!.updateProfile(displayName: firstName);
+    await user.currentUser!.updateDisplayName('$firstName $lastName');
   }
 
   void errorMessage(String message, bool isUsed) {
@@ -87,10 +98,6 @@ class _signUpScreenState extends State<signUpScreen> {
                   // Navigator.popUntil(context, (route) => route.isFirst);
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => SigninScreen()),
-                  // );
                 },
               ),
             ]);
@@ -103,8 +110,6 @@ class _signUpScreenState extends State<signUpScreen> {
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 195, 228, 255),
-          elevation: 1,
           title: const Text(
             "Sign Up",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -114,19 +119,19 @@ class _signUpScreenState extends State<signUpScreen> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration:
-                const BoxDecoration(color: Color.fromARGB(255, 211, 229, 255)),
+                BoxDecoration(color: Theme.of(context).colorScheme.background),
             child: SingleChildScrollView(
                 child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 120, 20, 0),
               child: Column(children: <Widget>[
                 const SizedBox(height: 20),
-                reuseableTextField("Enter First Name", Icons.person_2_outlined,
-                    false, _firstNameTextController, context),
+                reuseableTextField("First Name", Icons.person_2_outlined, false,
+                    _firstNameTextController, context),
                 const SizedBox(height: 20),
-                reuseableTextField("Enter Last Name", Icons.person_2_outlined,
-                    false, _lastNameTextController, context),
+                reuseableTextField("Last Name", Icons.person_2_outlined, false,
+                    _lastNameTextController, context),
                 const SizedBox(height: 20),
-                reuseableTextField("Enter Email", Icons.email_outlined, false,
+                reuseableTextField("Email", Icons.email_outlined, false,
                     _emailTextController, context),
                 const SizedBox(height: 20),
                 reuseableTextField("Password", Icons.lock_outline, true,
