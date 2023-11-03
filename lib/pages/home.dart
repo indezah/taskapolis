@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/signin.dart';
+import 'package:taskapolis/pages/help.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -52,7 +53,33 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.exit_to_app),
               title: Text('Log Out'),
               onTap: () {
+<<<<<<< Updated upstream
                 // Add your log out logic here
+=======
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HelpPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('Sign Out'),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AuthPage()),
+                );
+              },
+            ),
+            ListTile(
+              title: const Text('About'),
+              onTap: () {
+                // Update the state of the app
+                // ...
+                // Then close the drawer
+                // Navigator.pop(context);
+>>>>>>> Stashed changes
               },
             ),
           ],
