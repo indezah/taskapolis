@@ -12,6 +12,7 @@ import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/auth.dart';
 
 import 'package:taskapolis/pages/editTask.dart';
+import 'package:taskapolis/pages/help.dart';
 import 'package:taskapolis/pages/search.dart';
 import 'package:taskapolis/pages/signin.dart';
 
@@ -140,10 +141,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ListTile(
               title: const Text('Help'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                // Navigator.pop(context);
+                Navigator.push(context, 
+                MaterialPageRoute(builder: (context) => HelpPage()),
+                );
               },
             ),
             ListTile(
