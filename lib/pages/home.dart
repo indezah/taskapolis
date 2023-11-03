@@ -743,15 +743,6 @@ Widget _buildTaskListItem(
             trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red, // Change the icon color as needed
-                ),
-                onPressed: () {
-                  _showDeleteConfirmationDialog(document.id);
-                },
-              ),
               Text(
                 data['timestamp'] != null && data['timestamp'] != ''
                     ? '${(data['timestamp'] as Timestamp).toDate().day}/${(data['timestamp'] as Timestamp).toDate().month}'
@@ -760,6 +751,15 @@ Widget _buildTaskListItem(
                   fontSize: 14,
                   color: Theme.of(context).colorScheme.onBackground,
                 ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                  color: Colors.red, // Change the icon color as needed
+                ),
+                onPressed: () {
+                  _showDeleteConfirmationDialog(document.id);
+                },
               ),
             ],
           ),
