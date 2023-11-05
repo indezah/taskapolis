@@ -44,6 +44,7 @@ dependencies:
   provider: ^6.0.5
   flutter_colorpicker: ^1.0.3
   intl: ^0.18.1
+  firebase_messaging: ^14.6.8
   path_provider: ^2.1.1
   file_picker: ^5.5.0
   csv: ^5.1.1

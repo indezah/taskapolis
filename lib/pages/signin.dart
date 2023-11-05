@@ -107,7 +107,7 @@ class _SigninScreenState extends State<SigninScreen> {
               child: Column(children: <Widget>[
                 logoWidget("assets/images/logo.png"),
                 const SizedBox(height: 20),
-                Text(
+                const Text(
                   "TASKAPOLIS",
                   style: TextStyle(
                       fontSize: 24,
@@ -115,7 +115,7 @@ class _SigninScreenState extends State<SigninScreen> {
                       fontFamily: 'Space Grotesk'),
                 ),
                 const SizedBox(height: 20),
-                Text("Sign in to get started",
+                const Text("Sign in to get started",
                     style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
                 const SizedBox(height: 20),
                 reuseableTextField("Email", Icons.email_outlined, false,

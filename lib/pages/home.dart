@@ -1,7 +1,6 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors
 
 import 'dart:ui';
-import 'package:intl/intl.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,7 +14,6 @@ import 'package:taskapolis/pages/auth.dart';
 import 'package:taskapolis/pages/editTask.dart';
 import 'package:taskapolis/pages/help.dart';
 import 'package:taskapolis/pages/search.dart';
-import 'package:taskapolis/pages/signin.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -99,7 +97,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         fontSize: 24,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     Column(
@@ -132,7 +130,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                  MaterialPageRoute(builder: (context) =>  SettingsPage()),
                 );
                 // Update the state of the app
                 // ...
@@ -208,7 +206,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         fontSize: 18,
                         color: Theme.of(context).colorScheme.onBackground,
                       )),
-                  Text('$selectedFilter',
+                  Text(selectedFilter,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -269,12 +267,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   DateTime? taskDate = data['timestamp'] != null
                       ? (data['timestamp'] as Timestamp).toDate()
                       : null;
-                  bool isToday = taskDate != null &&
-                      now.year == taskDate.year &&
+                  bool isToday = now.year == taskDate!.year &&
                       now.month == taskDate.month &&
                       now.day == taskDate.day;
-                  bool isOverdue = taskDate != null &&
-                      taskDate.isBefore(DateTime(now.year, now.month, now.day));
+                  bool isOverdue = taskDate.isBefore(DateTime(now.year, now.month, now.day));
                   bool isCompleted = data['completed'];
                   if (isCompleted) {
                     completedTasks.add(document);
@@ -566,16 +562,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    AddTask()), // Replace 'AddTaskPage' with the actual class name of your "Add Task" page
+                    const AddTask()), // Replace 'AddTaskPage' with the actual class name of your "Add Task" page
           );
         },
-        label: Row(
+        label: const Row(
           children: [Icon(Icons.add), SizedBox(width: 5), Text("Add Task")],
         ),
       ),
     );
+    
   }
 
+bool showEditSuccessMessage = false;
   // Function to show a success message dialog
   void showSuccessEdit() {
     showDialog(
@@ -607,9 +605,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Color.fromARGB(
-                    255, 62, 172, 148), // Button background color
-                onPrimary: Colors.white, // Button text color
+                foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(
+                    255, 62, 172, 148), // Button text color
               ),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the alert dialog
@@ -627,17 +624,53 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildTaskListItem(
-      DocumentSnapshot document, Map<String, dynamic> data) {
-    print(data['timestamp']);
-    return GestureDetector(
-        onTap: () async {
-          // Navigate to the EditTaskPage with the animation
-          await Navigator.of(context).push(
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) {
-                return EditTaskPage(taskId: document.id);
-              },
+  // Function to delete a task
+Future<void> _deleteTask(String taskId) async {
+  try {
+    await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
+  } catch (e) {
+    // ignore: avoid_print
+    print('Error deleting task: $e');
+  }
+}
+
+  void _showDeleteConfirmationDialog(String taskId) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Delete Task'),
+        content: Text('Are you sure you want to delete this task?'),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Delete'),
+            onPressed: () {
+              _deleteTask(taskId);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Widget _buildTaskListItem(
+  DocumentSnapshot document, Map<String, dynamic> data) {
+  return GestureDetector(
+    onTap: () async {
+      // Navigate to the EditTaskPage with the animation
+      bool? edited = await Navigator.of(context).push(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) {
+            return EditTaskPage(taskId: document.id);
+          },
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
                 const begin = Offset(0.0, 1.0);
@@ -656,9 +689,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ),
           );
 
-          // Show the success alert when returning from EditTaskPage
-          showSuccessEdit();
-        },
+      if (edited == true) {
+        // Show the success alert when returning from EditTaskPage
+        showSuccessEdit();
+      }
+    },
+    
         child: Hero(
             tag: 'task_${document.id}', // Use a unique tag for each task
             child: Container(
@@ -714,22 +750,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   //     color: Theme.of(context).colorScheme.onBackground,
                   //   ),
                   // ),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        data['timestamp'] != null && data['timestamp'] != ''
-                            ? DateFormat('MMM d').format(
-                                (data['timestamp'] as Timestamp).toDate())
-                            : '',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context).colorScheme.onBackground,
-                        ),
-                      ),
-                    ],
-                  )),
-            )));
-  }
+            trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                data['timestamp'] != null && data['timestamp'] != ''
+                    ? '${(data['timestamp'] as Timestamp).toDate().day}/${(data['timestamp'] as Timestamp).toDate().month}'
+                    : '',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                  color: Colors.red, // Change the icon color as needed
+                ),
+                onPressed: () {
+                  _showDeleteConfirmationDialog(document.id);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
 }

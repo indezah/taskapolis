@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/editTask.dart'; // Import Firestore
 
 // Sample Task class for demonstration
@@ -21,14 +20,14 @@ class Task {
 
 class SearchScreen extends StatefulWidget {
   final String currentUserId; // Pass the current user's ID
-  SearchScreen({required this.currentUserId});
+  const SearchScreen({super.key, required this.currentUserId});
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedCategory = 'All';
   String _selectedPriority = 'All';
@@ -50,7 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
 // searchbar in appbar
         title: TextField(
           controller: _searchController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             // border: OutlineInputBorder(),
             // labelText: 'Search',
             hintText: 'Search',
@@ -94,7 +93,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     DropdownButton<String>(
                       value: _selectedCategory,
                       onChanged: (String? newValue) {
@@ -122,7 +121,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         color: Theme.of(context).colorScheme.onBackground,
                       ),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     DropdownButton<String>(
                       value: _selectedPriority,
                       onChanged: (String? newValue) {
@@ -152,7 +151,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 });
               },
             ),
-            Text('Show Completed'),
+            const Text('Show Completed'),
           ]),
 
           Expanded(
@@ -166,7 +165,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(); // or a loading indicator
+                  return const CircularProgressIndicator(); // or a loading indicator
                 }
 
                 // Map snapshot data to Task objects (similar to previous code)

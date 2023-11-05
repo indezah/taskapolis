@@ -1,13 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditTaskPage extends StatefulWidget {
   final String taskId;
 
-  const EditTaskPage({required this.taskId});
+  const EditTaskPage({super.key, required this.taskId});
 
   @override
   _EditTaskPageState createState() => _EditTaskPageState();
@@ -60,7 +59,9 @@ class _EditTaskPageState extends State<EditTaskPage> {
     super.dispose();
   }
 
-  @override
+ bool showSuccessMessage = false; // Initialize the flag
+
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -129,18 +130,21 @@ class _EditTaskPageState extends State<EditTaskPage> {
               ElevatedButton(
                 onPressed: () async {
                   await FirebaseFirestore.instance
-                      .collection('tasks')
-                      .doc(widget.taskId)
-                      .update({
-                    'title': titleController.text,
-                    'description': descriptionController.text,
-                    'priority': selectedPriority,
-                    'category': selectedCategory,
-                  });
-                  Navigator.pop(context);
+                    .collection('tasks')
+                    .doc(widget.taskId)
+                    .update({
+                      'title': titleController.text,
+                      'description': descriptionController.text,
+                      'priority': selectedPriority,
+                      'category': selectedCategory,
+                    });
+
+                  Navigator.pop(context, true); // Return true to indicate success
                 },
                 child: const Text('Save'),
               ),
+              // if (showSuccessMessage) // Show the message if the flag is true
+              //   Text('Task edited successfully'),
             ],
           ),
         ),

@@ -5,6 +5,8 @@ import 'package:intl/intl.dart'; // Add this import for DateFormat
 // import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class AddTask extends StatefulWidget {
+  const AddTask({super.key});
+
   @override
   _AddTaskState createState() => _AddTaskState();
 }
@@ -19,7 +21,7 @@ class _AddTaskState extends State<AddTask> {
   TimeOfDay? dueTime;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String timeOfDayToString(TimeOfDay timeOfDay) {
     return '${timeOfDay.hour}:${timeOfDay.minute}';
@@ -59,7 +61,7 @@ class _AddTaskState extends State<AddTask> {
     if (_formKey.currentState!.validate()) {
       if (selectedDueDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Please select Due Date and Time.'),
           ),
         );
@@ -103,17 +105,17 @@ class _AddTaskState extends State<AddTask> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Task'),
+        title: const Text('Add Task'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 10.0),
+                const SizedBox(height: 10.0),
                 TextFormField(
                   controller: titleController,
                   validator: (value) {
@@ -122,28 +124,28 @@ class _AddTaskState extends State<AddTask> {
                     }
                     return null;
                   },
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Title',
                     border: OutlineInputBorder(),
                   ),
                 ),
-                SizedBox(height: 20.0),
-                SizedBox(height: 10.0),
+                const SizedBox(height: 20.0),
+                const SizedBox(height: 10.0),
                 TextFormField(
                   maxLines: 5,
                   controller: notesController,
                   validator: (value) {
                     return null;
                   },
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Notes',
                   ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       flex: 3,
                       child: Text(
                         'Category',
@@ -168,7 +170,7 @@ class _AddTaskState extends State<AddTask> {
                           }
                           return null;
                         },
-                        items: <DropdownMenuItem<String>>[
+                        items: const <DropdownMenuItem<String>>[
                           DropdownMenuItem<String>(
                             value: 'Work',
                             child: Text('Work'),
@@ -206,10 +208,10 @@ class _AddTaskState extends State<AddTask> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       flex: 3,
                       child: Text(
                         'Priority',
@@ -235,7 +237,7 @@ class _AddTaskState extends State<AddTask> {
                           }
                           return null;
                         },
-                        items: <DropdownMenuItem<String>>[
+                        items: const <DropdownMenuItem<String>>[
                           DropdownMenuItem<String>(
                             value: "High",
                             child: Text('High'),
@@ -253,11 +255,11 @@ class _AddTaskState extends State<AddTask> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
+                    const Expanded(
                       flex: 2,
                       child: Text(
                         'Set a reminder',
@@ -280,11 +282,11 @@ class _AddTaskState extends State<AddTask> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
+                    const Expanded(
                       flex: 2,
                       child: Text(
                         'Due Date and Time', // Update the label
@@ -305,7 +307,7 @@ class _AddTaskState extends State<AddTask> {
                               ? DateFormat('MMM d, y H:mm')
                                   .format(selectedDueDate!) // Format as desired
                               : 'Select Date and Time',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16.0,
                           ),
                         ),
@@ -313,11 +315,11 @@ class _AddTaskState extends State<AddTask> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Center(
                   child: ElevatedButton(
                     onPressed: _saveTask,
-                    child: Text('Save Task'),
+                    child: const Text('Save Task'),
                   ),
                 ),
               ],
