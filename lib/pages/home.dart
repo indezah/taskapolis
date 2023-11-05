@@ -8,10 +8,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:taskapolis/pages/Settings.dart';
+import 'package:taskapolis/pages/about.dart';
 import 'package:taskapolis/pages/addTask.dart';
 import 'package:taskapolis/pages/auth.dart';
 
 import 'package:taskapolis/pages/editTask.dart';
+import 'package:taskapolis/pages/help.dart';
 import 'package:taskapolis/pages/search.dart';
 import 'package:taskapolis/pages/signin.dart';
 
@@ -140,10 +142,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ListTile(
               title: const Text('Help'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                // Navigator.pop(context);
+                Navigator.push(context, 
+                MaterialPageRoute(builder: (context) => HelpPage()),
+                );
               },
             ),
             ListTile(
@@ -159,10 +160,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ListTile(
               title: const Text('About'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
-                // Navigator.pop(context);
+                Navigator.push(context, 
+                MaterialPageRoute(builder: (context) => AboutAppPage()),
+                );
               },
             ),
           ],
