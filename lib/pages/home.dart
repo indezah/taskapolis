@@ -169,7 +169,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
               // image opacity
               colorFilter: ColorFilter.mode(
@@ -245,9 +245,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 bool isToday = taskDate != null &&
                     now.year == taskDate.year &&
                     now.month == taskDate.month &&
-                    now.day == taskDate.day;
+                    now.day == taskDate.day &&
+                    now.hour == taskDate.hour &&
+                    now.minute == taskDate.minute;
+
                 bool isOverdue = taskDate != null &&
-                    taskDate.isBefore(DateTime(now.year, now.month, now.day));
+                    taskDate.isBefore(DateTime(
+                        now.year, now.month, now.day, now.hour, now.minute));
                 bool isCompleted = data['completed'];
                 if (isCompleted) {
                   completedTasks.add(document);
@@ -392,7 +396,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         document.data() as Map<String, dynamic>;
                     return _buildTaskListItem(document, data);
                   }
-                  return Container(); // Return an empty container instead of null
+                  return Container(
+                    height: 50,
+                    color: Colors.transparent,
+                  );
                 },
               ),
             );
@@ -549,6 +556,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
             ),
+
           ],
         ),
       ),
@@ -574,8 +582,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Color.fromARGB(
-              255, 0, 0, 0), // Background color of the alert dialog
+          backgroundColor: Color.fromARGB(255, 0, 0, 0),
+          // Background color of the alert dialog
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0), // Rounded corners
           ),
@@ -594,8 +602,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
-          contentPadding: const EdgeInsets.symmetric(
-              vertical: 10.0), // Adjust vertical padding
+          contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+          // Adjust vertical padding
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
