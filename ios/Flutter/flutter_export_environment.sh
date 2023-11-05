@@ -1,9 +1,9 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=D:\3rd Year\SCS 3212 - Mobile Application Development\flutter"
-export "FLUTTER_APPLICATION_PATH=D:\3rd Year\SCS 3212 - Mobile Application Development\MAD-MiniProject-Flutter"
+export "FLUTTER_ROOT=/Users/nisura/flutter"
+export "FLUTTER_APPLICATION_PATH=/Users/nisura/Desktop/MAD-MiniProject-Flutter"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
-export "FLUTTER_TARGET=lib\main.dart"
+export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
 export "FLUTTER_BUILD_NUMBER=1"

@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>  SettingsPage()),
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
                 );
                 // Update the state of the app
                 // ...
@@ -140,8 +140,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ListTile(
               title: const Text('Help'),
               onTap: () {
-                Navigator.push(context, 
-                MaterialPageRoute(builder: (context) => HelpPage()),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HelpPage()),
                 );
               },
             ),
@@ -158,8 +159,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ListTile(
               title: const Text('About'),
               onTap: () {
-                Navigator.push(context, 
-                MaterialPageRoute(builder: (context) => AboutAppPage()),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutAppPage()),
                 );
               },
             ),
@@ -270,7 +272,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   bool isToday = now.year == taskDate!.year &&
                       now.month == taskDate.month &&
                       now.day == taskDate.day;
-                  bool isOverdue = taskDate.isBefore(DateTime(now.year, now.month, now.day));
+                  bool isOverdue =
+                      taskDate.isBefore(DateTime(now.year, now.month, now.day));
                   bool isCompleted = data['completed'];
                   if (isCompleted) {
                     completedTasks.add(document);
@@ -552,7 +555,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ],
               ),
             ),
-
           ],
         ),
       ),
@@ -570,10 +572,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
     );
-    
   }
 
-bool showEditSuccessMessage = false;
+  bool showEditSuccessMessage = false;
   // Function to show a success message dialog
   void showSuccessEdit() {
     showDialog(
@@ -605,7 +606,8 @@ bool showEditSuccessMessage = false;
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(
+                foregroundColor: Colors.white,
+                backgroundColor: const Color.fromARGB(
                     255, 62, 172, 148), // Button text color
               ),
               onPressed: () {
@@ -625,157 +627,155 @@ bool showEditSuccessMessage = false;
   }
 
   // Function to delete a task
-Future<void> _deleteTask(String taskId) async {
-  try {
-    await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
-  } catch (e) {
-    // ignore: avoid_print
-    print('Error deleting task: $e');
+  Future<void> _deleteTask(String taskId) async {
+    try {
+      await FirebaseFirestore.instance.collection('tasks').doc(taskId).delete();
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error deleting task: $e');
+    }
   }
-}
 
   void _showDeleteConfirmationDialog(String taskId) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Delete Task'),
-        content: Text('Are you sure you want to delete this task?'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: Text('Delete'),
-            onPressed: () {
-              _deleteTask(taskId);
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-
-Widget _buildTaskListItem(
-  DocumentSnapshot document, Map<String, dynamic> data) {
-  return GestureDetector(
-    onTap: () async {
-      // Navigate to the EditTaskPage with the animation
-      bool? edited = await Navigator.of(context).push(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) {
-            return EditTaskPage(taskId: document.id);
-          },
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                const begin = Offset(0.0, 1.0);
-                const end = Offset.zero;
-                const curve = Curves.easeInOut;
-                var tween = Tween(begin: begin, end: end).chain(
-                  CurveTween(curve: curve),
-                );
-
-                var offsetAnimation = animation.drive(tween);
-                return SlideTransition(
-                  position: offsetAnimation,
-                  child: child,
-                );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Task'),
+          content: Text('Are you sure you want to delete this task?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
               },
             ),
-          );
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                _deleteTask(taskId);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-      if (edited == true) {
-        // Show the success alert when returning from EditTaskPage
-        showSuccessEdit();
-      }
-    },
-    
-        child: Hero(
-            tag: 'task_${document.id}', // Use a unique tag for each task
-            child: Container(
-              // add background color to task
-              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(0),
+  Widget _buildTaskListItem(
+      DocumentSnapshot document, Map<String, dynamic> data) {
+    return GestureDetector(
+      onTap: () async {
+        // Navigate to the EditTaskPage with the animation
+        bool? edited = await Navigator.of(context).push(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              return EditTaskPage(taskId: document.id);
+            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.easeInOut;
+              var tween = Tween(begin: begin, end: end).chain(
+                CurveTween(curve: curve),
+              );
+
+              var offsetAnimation = animation.drive(tween);
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
+          ),
+        );
+
+        if (edited == true) {
+          // Show the success alert when returning from EditTaskPage
+          showSuccessEdit();
+        }
+      },
+      child: Hero(
+        tag: 'task_${document.id}', // Use a unique tag for each task
+        child: Container(
+          // add background color to task
+          margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(0),
+          ),
+          // margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+          child: ListTile(
+            leading: Checkbox(
+              // change checkbox border color according to priority
+              // grey checkbox if task is completed
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
               ),
-              // margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              child: ListTile(
-                  leading: Checkbox(
-                    // change checkbox border color according to priority
-                    // grey checkbox if task is completed
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
 
-                    side: MaterialStateBorderSide.resolveWith(
-                        (states) => BorderSide(
-                            width: 1.0,
-                            color: data['completed']
-                                ? Theme.of(context).colorScheme.onBackground
-                                : data['priority'] == "High"
-                                    ? Colors.red
-                                    : data['priority'] == "Medium"
-                                        ? Colors.orange
-                                        : Colors.grey)),
+              side: MaterialStateBorderSide.resolveWith((states) => BorderSide(
+                  width: 1.0,
+                  color: data['completed']
+                      ? Theme.of(context).colorScheme.onBackground
+                      : data['priority'] == "High"
+                          ? Colors.red
+                          : data['priority'] == "Medium"
+                              ? Colors.orange
+                              : Colors.grey)),
 
-                    // grey checkbox if task is completed
-                    fillColor: MaterialStateProperty.resolveWith((states) =>
-                        data['completed']
-                            ? Theme.of(context).colorScheme.onBackground
-                            : null),
-                    value: data['completed'],
-                    onChanged: (bool? value) {
-                      // Update the completed field with the new value
-                      FirebaseFirestore.instance
-                          .collection('tasks')
-                          .doc(document.id)
-                          .update({'completed': value});
-                    },
-                  ),
-                  title: Text(data['title'],
-                      style: TextStyle(
-                        // fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.onBackground,
-                      )),
-                  // subtitle: Text(
-                  //   data['category'],
-                  //   style: TextStyle(
-                  //     fontSize: 14,
-                  //     color: Theme.of(context).colorScheme.onBackground,
-                  //   ),
-                  // ),
-            trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                data['timestamp'] != null && data['timestamp'] != ''
-                    ? '${(data['timestamp'] as Timestamp).toDate().day}/${(data['timestamp'] as Timestamp).toDate().month}'
-                    : '',
+              // grey checkbox if task is completed
+              fillColor: MaterialStateProperty.resolveWith((states) =>
+                  data['completed']
+                      ? Theme.of(context).colorScheme.onBackground
+                      : null),
+              value: data['completed'],
+              onChanged: (bool? value) {
+                // Update the completed field with the new value
+                FirebaseFirestore.instance
+                    .collection('tasks')
+                    .doc(document.id)
+                    .update({'completed': value});
+              },
+            ),
+            title: Text(data['title'],
                 style: TextStyle(
-                  fontSize: 14,
+                  // fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onBackground,
+                )),
+            // subtitle: Text(
+            //   data['category'],
+            //   style: TextStyle(
+            //     fontSize: 14,
+            //     color: Theme.of(context).colorScheme.onBackground,
+            //   ),
+            // ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  data['timestamp'] != null && data['timestamp'] != ''
+                      ? '${(data['timestamp'] as Timestamp).toDate().day}/${(data['timestamp'] as Timestamp).toDate().month}'
+                      : '',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.delete,
-                  color: Colors.red, // Change the icon color as needed
+                IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red, // Change the icon color as needed
+                  ),
+                  onPressed: () {
+                    _showDeleteConfirmationDialog(document.id);
+                  },
                 ),
-                onPressed: () {
-                  _showDeleteConfirmationDialog(document.id);
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
