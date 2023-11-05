@@ -90,6 +90,7 @@ class _SigninScreenState extends State<SigninScreen> {
     );
   }
 
+  bool passenable = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,17 +103,63 @@ class _SigninScreenState extends State<SigninScreen> {
             child: SingleChildScrollView(
                 child: Padding(
               padding: EdgeInsets.fromLTRB(
-                  20, MediaQuery.of(context).size.height * 0.2, 20, 0),
+                  20, MediaQuery.of(context).size.height * 0.15, 20, 0),
               child: Column(children: <Widget>[
                 logoWidget("assets/images/logo.png"),
+                const SizedBox(height: 20),
+                const Text(
+                  "TASKAPOLIS",
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Space Grotesk'),
+                ),
+                const SizedBox(height: 20),
+                const Text("Sign in to get started",
+                    style: TextStyle(fontSize: 16, fontFamily: 'Inter')),
                 const SizedBox(height: 20),
                 reuseableTextField("Email", Icons.email_outlined, false,
                     emailController, context),
                 const SizedBox(height: 20),
-                reuseableTextField("Password", Icons.lock_outline, true,
-                    passwordController, context),
+                TextField(
+                  controller: passwordController,
+                  obscureText: passenable,
+                  enableSuggestions: passenable,
+                  autocorrect: passenable,
+                  cursorColor: Theme.of(context).colorScheme.onBackground,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: "Password",
+                    // prefixIcon: Icon(icon),
+                    labelStyle: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground),
+                    // filled: true,
+                    fillColor: Colors.white,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        passenable
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Theme.of(context).colorScheme.onBackground,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          passenable = !passenable;
+                        });
+                      },
+                    ),
+                  ),
+                  keyboardType: TextInputType.text,
+                ),
+                // reuseableTextField("Password", Icons.lock_outline, true,
+                //     passwordController, context
+
                 const SizedBox(height: 20),
                 signInSignUpButton(context, true, signIn),
+                const SizedBox(height: 20),
                 signUpOption()
               ]),
             ))));

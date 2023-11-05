@@ -59,4 +59,13 @@ class DefaultFirebaseOptions {
     projectId: 'taskapolis',
     storageBucket: 'taskapolis.appspot.com',
   );
+
+  //   await Firebase.initializeApp(
+  //     options:const FirebaseOptions( apiKey: 'AIzaSyCCVnZm3xJSHtN121SmKs-EzT0fZOxnQDw',
+  //   appId: '1:163337067674:android:74d6a149afac5224e21323',
+  //   messagingSenderId: '163337067674',
+  //   projectId: 'taskapolis',
+  //   storageBucket: 'taskapolis.appspot.com',)
+    
+  // );
 }
